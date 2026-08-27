@@ -412,7 +412,7 @@ async function loadProducts(){
       }).filter(p=>p.id && p.name && p.price>0);
       items.sort((a,b)=> a.cat.localeCompare(b.cat) || a.name.localeCompare(b.name));
       if(items.length) return { items, live:true };
-      return { items: FALLBACK, live:false, warn:"Connected to Firebase but no products came back yet. Run the seed script, then reload. Showing sample data." };
+      return { items: FALLBACK, live:false };
     }catch(e){
       return { items: FALLBACK, live:false, warn:"Could not reach Firebase. Check the firebase config in CONFIG and that Firestore is enabled with the storefront rules. Showing sample data for now." };
     }
