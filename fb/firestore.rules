@@ -3,12 +3,17 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // Public storefront: anyone may READ products that are published.
-    // No one can WRITE from the browser. Product edits happen in the
-    // Firebase console or via the seed script (admin SDK), both of which
-    // bypass these rules safely.
+    // The browser may only ever update the image_url field of a product
+    // that already exists (used by admin.html for photo uploads) — no
+    // creating, deleting, or changing price/name/published from the
+    // client. Every other edit happens in the Firebase console or via
+    // the seed script (admin SDK), both of which bypass these rules.
     match /products/{id} {
       allow read: if resource.data.published == true;
-      allow write: if false;
+      allow update: if resource != null
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['image_url'])
+                    && request.resource.data.image_url is string;
+      allow create, delete: if false;
     }
 
   }

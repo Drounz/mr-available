@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MR AVAILABLE — Photo uploader</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<style>
+  :root{--ink:#14213A;--paper:#FFFFFF;--soft:#F4F5F7;--line:#E6E9EE;--muted:#6C7480;--accent:#E79213;--price:#0E7C5A;--ok:#0E7C5A;--err:#C0392B}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:"Poppins",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
+  .wrap{max-width:760px;margin:0 auto;padding:40px 20px 80px}
+  h1{font-size:26px;font-weight:800;letter-spacing:-.02em;margin:0 0 6px}
+  .lead{color:var(--muted);font-size:14px;margin:0 0 24px;max-width:560px}
+  .card{background:var(--soft);border-radius:16px;padding:20px;margin-bottom:20px}
+  .card h2{font-size:15px;font-weight:700;margin:0 0 10px}
+  .card p{font-size:13px;color:var(--muted);margin:0 0 10px}
+  code{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:12.5px}
+  .drop{border:2px dashed var(--line);border-radius:16px;padding:36px 20px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
+  .drop.over{border-color:var(--accent);background:#FFF7E6}
+  .drop input{display:none}
+  .drop .dt{font-weight:600;font-size:14.5px}
+  .drop .ds{font-size:12.5px;color:var(--muted);margin-top:4px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em}
+  .lookup{max-height:220px;overflow-y:auto;border:1px solid var(--line);border-radius:10px;background:#fff}
+  .lookup table{margin:0}
+  .search{width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:999px;font-size:13.5px;font-family:inherit;margin-bottom:10px;background:#fff}
+  .rows{margin-top:20px;display:flex;flex-direction:column;gap:10px}
+  .row{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+  .row img{width:44px;height:44px;border-radius:8px;object-fit:cover;background:var(--soft);flex:0 0 auto}
+  .row .info{flex:1;min-width:0}
+  .row .fn{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .row .st{font-size:12px;color:var(--muted)}
+  .row .st.ok{color:var(--ok)}
+  .row .st.err{color:var(--err)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Photo uploader</h1>
+  <p class="lead">Upload product photos here. This page is not linked from the storefront and does not require a login — keep the URL to yourself.</p>
+
+  <div class="card">
+    <h2>How it works</h2>
+    <p>Name each image file after the product's ID, then drop it below. <code>TV001.jpg</code> uploads and attaches itself to product <code>TV001</code> automatically. Only that product's photo changes — nothing else about it.</p>
+  </div>
+
+  <div class="card">
+    <h2>Look up a product ID</h2>
+    <p>Type a name or brand to find the ID to save your file as.</p>
+    <input class="search" id="search" placeholder="Search products..." />
+    <div class="lookup"><table id="lookupTable"><tbody></tbody></table></div>
+  </div>
+
+  <div class="drop" id="drop">
+    <input type="file" id="fileInput" accept="image/*" multiple />
+    <div class="dt">Click to choose photos, or drag them here</div>
+    <div class="ds">JPG or PNG, up to 5MB each. Multiple files at once is fine.</div>
+  </div>
+
+  <div class="rows" id="rows"></div>
+</div>
+
+<script>
+const CONFIG = {
+  firebase: {
+    apiKey: "AIzaSyA0QuGMBAMIGfQbrXCVVBGy0zCDPro2Yfw",
+    authDomain: "mr-available.firebaseapp.com",
+    projectId: "mr-available",
+    storageBucket: "mr-available.firebasestorage.app",
+    messagingSenderId: "549740208803",
+    appId: "1:549740208803:web:4bf02316a76ff97bf29516"
+  }
+};
+
+if(!firebase.apps.length) firebase.initializeApp(CONFIG.firebase);
+const db = firebase.firestore();
+const storage = firebase.storage();
+
+function escapeHtml(s){return String(s||"").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+
+let PRODUCTS = [];
+async function loadLookup(){
+  const snap = await db.collection("products").where("published","==",true).get();
+  PRODUCTS = snap.docs.map(d=>{
+    const r = d.data();
+    return { id: d.id, name: r.name||"", brand: r.brand||"" };
+  }).sort((a,b)=>a.id.localeCompare(b.id));
+  renderLookup("");
+}
+function renderLookup(q){
+  const query = q.trim().toLowerCase();
+  const shown = PRODUCTS.filter(p=>!query || (p.id+" "+p.name+" "+p.brand).toLowerCase().includes(query));
+  document.querySelector("#lookupTable tbody").innerHTML = shown.map(p=>
+    `<tr><td><code>${escapeHtml(p.id)}</code></td><td>${escapeHtml(p.brand)} ${escapeHtml(p.name)}</td></tr>`
+  ).join("") || `<tr><td colspan="2" style="color:var(--muted)">No match.</td></tr>`;
+}
+document.getElementById("search").addEventListener("input", e=>renderLookup(e.target.value));
+loadLookup().catch(()=>{ document.querySelector("#lookupTable tbody").innerHTML = `<tr><td colspan="2" style="color:var(--err)">Could not load products.</td></tr>`; });
+
+const rowsEl = document.getElementById("rows");
+function addRow(file){
+  const id = file.name.replace(/\.[^.]+$/, "").trim();
+  const row = document.createElement("div");
+  row.className = "row";
+  const previewUrl = URL.createObjectURL(file);
+  row.innerHTML = `<img src="${previewUrl}" /><div class="info"><div class="fn">${escapeHtml(file.name)} → <code>${escapeHtml(id)}</code></div><div class="st">Uploading...</div></div>`;
+  rowsEl.prepend(row);
+  const statusEl = row.querySelector(".st");
+  uploadOne(id, file, statusEl);
+}
+async function uploadOne(id, file, statusEl){
+  try{
+    const ext = (file.name.match(/\.([^.]+)$/) || [,"jpg"])[1].toLowerCase();
+    const ref = storage.ref().child(`products/${id}.${ext}`);
+    await ref.put(file, { contentType: file.type || "image/jpeg" });
+    const url = await ref.getDownloadURL();
+    await db.collection("products").doc(id).update({ image_url: url });
+    statusEl.textContent = "Done — attached to " + id;
+    statusEl.className = "st ok";
+  }catch(e){
+    statusEl.textContent = e.code === "not-found" || /No document to update/.test(e.message||"")
+      ? `No product with ID "${id}" exists in Firestore.`
+      : "Upload failed: " + (e.message || e);
+    statusEl.className = "st err";
+  }
+}
+
+const drop = document.getElementById("drop");
+const fileInput = document.getElementById("fileInput");
+drop.addEventListener("click", ()=>fileInput.click());
+fileInput.addEventListener("change", ()=>{
+  Array.from(fileInput.files).forEach(addRow);
+  fileInput.value = "";
+});
+["dragenter","dragover"].forEach(evt=>drop.addEventListener(evt, e=>{ e.preventDefault(); drop.classList.add("over"); }));
+["dragleave","drop"].forEach(evt=>drop.addEventListener(evt, e=>{ e.preventDefault(); drop.classList.remove("over"); }));
+drop.addEventListener("drop", e=>{
+  Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith("image/")).forEach(addRow);
+});
+</script>
+</body>
+</html>

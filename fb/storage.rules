@@ -1,0 +1,16 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Product photos: anyone may read (the storefront displays them).
+    // Uploads are restricted to the products/ folder, images only,
+    // capped at 5MB, so a stray link can only ever add a picture there
+    // — it cannot touch any other file in the bucket.
+    match /products/{fileName} {
+      allow read: if true;
+      allow write: if request.resource.size < 5 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*');
+    }
+
+  }
+}

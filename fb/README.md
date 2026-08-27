@@ -4,7 +4,9 @@ Your site now reads products from Firebase Firestore. Firestore is free to start
 
 Files (drop these into the repo):
 - `index.html` — the site, already wired for Firebase.
+- `admin.html` — private photo uploader (see section 6 below).
 - `fb/firestore.rules` — security rules.
+- `fb/storage.rules` — security rules for uploaded photos.
 - `fb/seed/products.json` — your 50 products.
 - `fb/seed/seed.js`, `fb/seed/package.json` — one-time loader.
 
@@ -33,11 +35,18 @@ These config values are safe in a public repo. Security is enforced by the Fires
 ## 5. Deploy
 Commit and let Vercel redeploy. The site flips from sample data to your live products.
 
+## 6. Turn on photo uploads
+`admin.html` lets you drop in product photos and have them attach themselves automatically — no manual `image_url` pasting.
+1. Firebase console: **Build > Storage > Get started**. Use the default bucket (already matches `storageBucket` in your config).
+2. In Storage, open the **Rules** tab, replace the contents with `fb/storage.rules`, and **Publish**.
+3. Open `admin.html` (it's part of the deployed site, e.g. `yoursite.com/admin.html`, but is not linked from the storefront). This page has no login — anyone with the link could upload a photo or replace an existing one, though the rules stop them from touching prices, names, or creating products. Do not post the link publicly.
+4. Name each photo file after the product's ID (check the lookup table on the page for the right ID), then drag it into the drop zone. It uploads to Storage and writes the resulting URL into that product's `image_url` automatically.
+
 ## Everyday use (your admin)
 - **Add a product**: Firestore > Data > add a document in `products`. Use the product code as the document id. Fields: `name`, `category`, `brand`, `selling_price` (number), optionally `model` and `image_url`, and `published` = true.
 - **Hide a product**: set `published` to false. It leaves the site, stays in the database.
 - **Change a price**: edit `selling_price`.
-- **Add a photo**: paste a direct image link into `image_url`.
+- **Add a photo**: use `admin.html` (see section 6), or paste a direct image link into `image_url` yourself.
 
 ## Notes
 - Cost prices are intentionally NOT stored in Firestore, because Firestore rules protect whole documents, not single fields. Keep your cost and margin records in your central sheet.
