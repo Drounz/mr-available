@@ -103,10 +103,19 @@ footer{background:var(--ink);color:#fff;margin-top:40px}.fgrid{display:grid;gap:
 <div class="dfoot hidden" id="dfoot"><div class="tot"><span class="tl">Total</span><span class="tv" id="drawerTotal">₦0</span></div>
 <a class="send" id="sendBtn" target="_blank" rel="noreferrer"><svg width="19" height="19" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2Z"/></svg>Send bundle on WhatsApp</a>
 <p class="fine">Opens a ready-made message. You confirm before anyone pays.</p></div></div></div>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
 <script>
 const CONFIG = {
   whatsapp: "2348119610718",
-  supabase: { url: "", key: "" }
+  firebase: {
+    apiKey: "AIzaSyA0QuGMBAMIGfQbrXCVVBGy0zCDPro2Yfw",
+    authDomain: "mr-available.firebaseapp.com",
+    projectId: "mr-available",
+    storageBucket: "mr-available.firebasestorage.app",
+    messagingSenderId: "549740208803",
+    appId: "1:549740208803:web:4bf02316a76ff97bf29516"
+  }
 };
 const FALLBACK=[
   {id:"COOK001",name:"Gas Cooker 4-Burner All Gas Standing (Black)",model:"",cat:"Cookers",brand:"Nexus",price:199000,image:""},
@@ -165,16 +174,23 @@ const boxSVG = `<svg width="42" height="42" viewBox="0 0 24 24" fill="none" stro
 const waSVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2Z"/></svg>`;
 let PRODUCTS=[], CATS=["All"], state={cat:"All",q:"",bundle:{},open:false};
 async function loadProducts(){
-  const sb = CONFIG.supabase || {};
-  if(sb.url && sb.key){
+  const fb = CONFIG.firebase || {};
+  if(fb.apiKey && fb.projectId && typeof firebase !== "undefined"){
     try{
-      const q = "select=id,name,model,category,brand,selling_price,image_url&published=eq.true&order=category.asc,name.asc";
-      const res = await fetch(`${sb.url.replace(/\/$/,"")}/rest/v1/products?${q}`, { headers: { apikey: sb.key, authorization: `Bearer ${sb.key}` } });
-      const data = await res.json();
-      const items = (Array.isArray(data) ? data : []).map(r=>({ id:String(r.id||"").trim(), name:String(r.name||"").trim(), model:String(r.model||"").trim(), cat:String(r.category||"Other").trim(), brand:String(r.brand||"").trim(), image:String(r.image_url||"").trim(), price:Number(r.selling_price)||0 })).filter(p=>p.id && p.name && p.price>0);
-      if(items.length) return { items, live:true };
-      return { items: FALLBACK, live:false, warn:"Connected to the database but it returned no products yet. Add products in Supabase, then reload. Showing sample data." };
-    }catch(e){ return { items: FALLBACK, live:false, warn:"Could not reach the database. Check the Supabase URL and anon key in CONFIG. Showing sample data for now." }; }
+      if(!window.__fbApp){ window.__fbApp = firebase.initializeApp(fb); }
+      const db = firebase.firestore();
+      const snap = await db.collection("products").where("published","==",true).get();
+      const items = [];
+      snap.forEach(function(doc){
+        const r = doc.data();
+        const price = Number(r.selling_price)||0;
+        const name = String(r.name||"").trim();
+        if(!name || price<=0) return;
+        items.push({ id: doc.id, name: name, model: String(r.model||"").trim(), cat: String(r.category||"Other").trim(), brand: String(r.brand||"").trim(), image: String(r.image_url||"").trim(), price: price });
+      });
+      if(items.length) return { items: items, live: true };
+      return { items: FALLBACK, live:false, warn:"Connected to Firebase but no products found yet. Add products in Firestore, then reload. Showing sample data." };
+    }catch(e){ return { items: FALLBACK, live:false, warn:"Could not reach Firebase. Check your firebaseConfig in CONFIG. Showing sample data for now." }; }
   }
   return { items: FALLBACK, live:false };
 }
@@ -252,7 +268,7 @@ document.getElementById("footWa").href=helloLink;
   const r=await loadProducts(); PRODUCTS=r.items;
   CATS=["All"].concat(Array.from(new Set(PRODUCTS.map(function(p){return p.cat;}))).sort());
   if(r.warn) document.getElementById("notice").innerHTML=`<div class="notice">${escapeHtml(r.warn)}</div>`;
-  else if(!r.live&&!(CONFIG.supabase&&CONFIG.supabase.url)) document.getElementById("notice").innerHTML=`<div class="notice">Preview mode: showing built-in sample data. Add your Supabase URL and key in CONFIG to go live.</div>`;
+  else if(!r.live&&!(CONFIG.firebase&&CONFIG.firebase.apiKey)) document.getElementById("notice").innerHTML=`<div class="notice">Preview mode: showing built-in sample data. Add your Firebase config in CONFIG to go live.</div>`;
   render();
 })();
 </script>
