@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Public storefront: anyone may READ products that are published.
+    // No one can WRITE from the browser. Product edits happen in the
+    // Firebase console or via the seed script (admin SDK), both of which
+    // bypass these rules safely.
+    match /products/{id} {
+      allow read: if resource.data.published == true;
+      allow write: if false;
+    }
+
+  }
+}

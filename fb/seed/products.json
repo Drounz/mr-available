@@ -1,0 +1,502 @@
+[
+  {
+    "id": "COOK001",
+    "name": "Gas Cooker 4-Burner All Gas Standing (Black)",
+    "model": "",
+    "category": "Cookers",
+    "brand": "Nexus",
+    "selling_price": 199000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "COOK002",
+    "name": "Gas Cooker 3 Gas + 1 Electric Standing (Black)",
+    "model": "",
+    "category": "Cookers",
+    "brand": "Nexus",
+    "selling_price": 205000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "COOK003",
+    "name": "Gas Cooker 60x60 4-Burner All Gas Standing (Silver)",
+    "model": "",
+    "category": "Cookers",
+    "brand": "Maxi",
+    "selling_price": 248000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "COOK004",
+    "name": "Gas Cooker 60x60 Standing Formica Wood Finish",
+    "model": "",
+    "category": "Cookers",
+    "brand": "Maxi",
+    "selling_price": 295000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "COOK005",
+    "name": "Gas Cooker 50x50 3 Gas + 1 Electric Auto-Ignition (Grey)",
+    "model": "",
+    "category": "Cookers",
+    "brand": "Skyrun",
+    "selling_price": 179000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "MICR001",
+    "name": "Microwave 20L Manual Knob (White)",
+    "model": "H20MOWS14",
+    "category": "Microwaves",
+    "brand": "Hisense",
+    "selling_price": 99000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "MICR002",
+    "name": "Microwave 20L Digital LED Automatic (Black)",
+    "model": "H20MOBS6",
+    "category": "Microwaves",
+    "brand": "Hisense",
+    "selling_price": 114000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "MICR003",
+    "name": "Microwave 20L Manual 700W Grill",
+    "model": "MG720CFB-B",
+    "category": "Microwaves",
+    "brand": "Midea",
+    "selling_price": 149000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "MICR004",
+    "name": "Microwave 20L Manual (Black)",
+    "model": "",
+    "category": "Microwaves",
+    "brand": "Maxi",
+    "selling_price": 79900,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "FAN001",
+    "name": "Standing Fan 18\"",
+    "model": "",
+    "category": "Fans",
+    "brand": "Duravolt",
+    "selling_price": 30000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "FAN002",
+    "name": "Standing Fan 16\"",
+    "model": "",
+    "category": "Fans",
+    "brand": "Binatone",
+    "selling_price": 65000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "FAN003",
+    "name": "Standing Rechargeable Fan 18\" AC/DC with Bluetooth",
+    "model": "",
+    "category": "Fans",
+    "brand": "Qasa",
+    "selling_price": 128000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "FAN004",
+    "name": "Rechargeable Standing Fan 18\" AC/DC",
+    "model": "",
+    "category": "Fans",
+    "brand": "Duravolt",
+    "selling_price": 110000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "FAN005",
+    "name": "Rechargeable Standing Fan 18\" AC/DC",
+    "model": "",
+    "category": "Fans",
+    "brand": "Century",
+    "selling_price": 122000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "FAN006",
+    "name": "Standing Fan AC/DC 18\"",
+    "model": "",
+    "category": "Fans",
+    "brand": "Qasa",
+    "selling_price": 63000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "FAN007",
+    "name": "Wall Fan AC/DC 16\"",
+    "model": "",
+    "category": "Fans",
+    "brand": "Qasa",
+    "selling_price": 47000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "FAN008",
+    "name": "Wall Fan 18\"",
+    "model": "",
+    "category": "Fans",
+    "brand": "Ox",
+    "selling_price": 37000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "TV001",
+    "name": "Smart TV 43\"",
+    "model": "",
+    "category": "Television",
+    "brand": "Hisense",
+    "selling_price": 390000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "TV002",
+    "name": "QLED Smart TV 50\"",
+    "model": "",
+    "category": "Television",
+    "brand": "Hisense",
+    "selling_price": 585000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "TV003",
+    "name": "QLED Smart TV 75\", Google TV",
+    "model": "",
+    "category": "Television",
+    "brand": "TCL",
+    "selling_price": 1540000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "FRIDGE001",
+    "name": "Refrigerator/Freezer 142L",
+    "model": "180SH",
+    "category": "Refrigerator",
+    "brand": "Hisense",
+    "selling_price": 330000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "GEN001",
+    "name": "Generator 2.5 KVA, Aluminium Coil",
+    "model": "",
+    "category": "Generator",
+    "brand": "Senwei",
+    "selling_price": 235000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "GEN002",
+    "name": "Generator 2.5 KVA, Copper Coil",
+    "model": "Model 3000",
+    "category": "Generator",
+    "brand": "Firman",
+    "selling_price": 415000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "WM001",
+    "name": "Washing Machine 11kg",
+    "model": "",
+    "category": "Washing Machine",
+    "brand": "Skyron",
+    "selling_price": 275000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "WM002",
+    "name": "Washing Machine 11kg",
+    "model": "",
+    "category": "Washing Machine",
+    "brand": "Hisense",
+    "selling_price": 350000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "WM003",
+    "name": "Washing Machine 7kg Twin Tub Semi-Automatic",
+    "model": "SPB-80E05S",
+    "category": "Washing Machine",
+    "brand": "Skyron",
+    "selling_price": 199000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "WM004",
+    "name": "Washing Machine 7kg",
+    "model": "",
+    "category": "Washing Machine",
+    "brand": "Hisense",
+    "selling_price": 230000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "WM005",
+    "name": "Automatic Washing Machine 8kg",
+    "model": "",
+    "category": "Washing Machine",
+    "brand": "Hisense",
+    "selling_price": 560000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "WM006",
+    "name": "Front Load Automatic Washing Machine 8kg",
+    "model": "",
+    "category": "Washing Machine",
+    "brand": "Hisense",
+    "selling_price": 495000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "WM007",
+    "name": "Front Load Automatic Washing Machine 10kg",
+    "model": "HWD-100-BI-1495-9SB",
+    "category": "Washing Machine",
+    "brand": "Hisense",
+    "selling_price": 1150000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "WM008",
+    "name": "Front Load Automatic Washing Machine 10kg",
+    "model": "HWD-100-BD-14979S",
+    "category": "Washing Machine",
+    "brand": "Hisense",
+    "selling_price": 1220000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "WM009",
+    "name": "Top Load Automatic Washing Machine 8kg",
+    "model": "TL-8080FYS-6",
+    "category": "Washing Machine",
+    "brand": "Haier Thermocool",
+    "selling_price": 480000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "WM010",
+    "name": "Top Load Automatic Washing Machine 10.5kg",
+    "model": "TL-105FYS-6",
+    "category": "Washing Machine",
+    "brand": "Haier Thermocool",
+    "selling_price": 560000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "AF001",
+    "name": "Air Fryer 8.5L, LCD Touch Control",
+    "model": "",
+    "category": "Air Fryer",
+    "brand": "Kenwood",
+    "selling_price": 75000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "FRZ001",
+    "name": "Inverter Chest Freezer 360L, Silver",
+    "model": "",
+    "category": "Freezer",
+    "brand": "Hisense",
+    "selling_price": 799000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "FRZ002",
+    "name": "Inverter Chest Freezer 360L, White",
+    "model": "",
+    "category": "Freezer",
+    "brand": "Hisense",
+    "selling_price": 775000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "FRZ003",
+    "name": "Inverter Chest Freezer 220-240L, Silver",
+    "model": "",
+    "category": "Freezer",
+    "brand": "Media",
+    "selling_price": 499000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "OVEN001",
+    "name": "Electric Oven 37L",
+    "model": "COV-8320C",
+    "category": "Oven",
+    "brand": "Century",
+    "selling_price": 119900,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "BLEND001",
+    "name": "Electric Blender 3-in-1, 2,000W",
+    "model": "",
+    "category": "Blender",
+    "brand": "Century",
+    "selling_price": 99000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "SND001",
+    "name": "Soundbar 580W, Wireless Subwoofer",
+    "model": "",
+    "category": "Home Theatre",
+    "brand": "Hisense",
+    "selling_price": 355000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "SND002",
+    "name": "Soundbar 240W, Dolby Atmos",
+    "model": "HS-2100FM",
+    "category": "Home Theatre",
+    "brand": "Hisense",
+    "selling_price": 199000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "EXT001",
+    "name": "Extension Board, Pure Copper, Surge Protection",
+    "model": "",
+    "category": "Extension Board",
+    "brand": "Smart England",
+    "selling_price": 13500,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "EXT002",
+    "name": "Extension Board, USB, Surge Protection",
+    "model": "",
+    "category": "Extension Board",
+    "brand": "Schneider",
+    "selling_price": 15000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "STAB001",
+    "name": "Stabilizer 1,000W",
+    "model": "",
+    "category": "Stabilizer",
+    "brand": "Duravolt",
+    "selling_price": 42000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "STAB002",
+    "name": "Stabilizer 2,000W",
+    "model": "",
+    "category": "Stabilizer",
+    "brand": "Century",
+    "selling_price": 92000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "STAB003",
+    "name": "Stabilizer 5,000W",
+    "model": "",
+    "category": "Stabilizer",
+    "brand": "Century",
+    "selling_price": 172000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "AC001",
+    "name": "Air Conditioner 1 HP (Standard)",
+    "model": "",
+    "category": "Air Conditioner",
+    "brand": "Hisense",
+    "selling_price": 390000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "AC002",
+    "name": "Air Conditioner 1.5 HP (Standard)",
+    "model": "",
+    "category": "Air Conditioner",
+    "brand": "Hisense",
+    "selling_price": 430000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "AC003",
+    "name": "Inverter Air Conditioner 1 HP",
+    "model": "",
+    "category": "Air Conditioner",
+    "brand": "Hisense",
+    "selling_price": 510000,
+    "image_url": "",
+    "published": true
+  },
+  {
+    "id": "AC004",
+    "name": "Inverter Air Conditioner 1.5 HP",
+    "model": "",
+    "category": "Air Conditioner",
+    "brand": "Hisense",
+    "selling_price": 560000,
+    "image_url": "",
+    "published": true
+  }
+]
