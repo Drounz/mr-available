@@ -3,29 +3,33 @@
 A storefront for MR AVAILABLE, a home appliances and electronics store in Nigeria. Customers browse products, build a bundle, and place the order in one tap on WhatsApp. There is no on-site checkout or payment.
 
 ## Stack (keep it simple)
-- One file: `index.html`. Plain HTML, CSS, and vanilla JS. No build step, no framework, no bundler.
+- Storefront: one file, `index.html`. Plain HTML, CSS, and vanilla JS. No build step, no framework, no bundler.
+- `admin.html` is a second, unlisted file for photo uploads (see below) — the one deliberate exception to "single file."
 - Fonts: Poppins via Google Fonts. Icons are inline SVG.
-- Database: Firebase Firestore. The site reads products directly from the browser using the Firebase compat SDK (loaded from gstatic in the head). No backend server.
+- Database and storage: Supabase (Postgres + Storage). The site reads products directly from the browser using `@supabase/supabase-js` (loaded from a CDN in the head). No backend server.
 - Hosting: static, deploys to Vercel/Netlify/Cloudflare Pages as-is.
-- The site does NOT depend on Google Sheets or Supabase. Older sheet/Supabase code is deprecated, do not reintroduce it.
+- The site does NOT depend on Firebase or Google Sheets. Older Firebase code is deprecated, do not reintroduce it (Firebase Storage forces the paid Blaze plan just to enable it at all — Supabase's free tier does not).
 
 ## How data flows
-On load, `loadProducts()` initializes Firebase from `CONFIG.firebase`, then reads `products` where `published == true` and maps rows to `{id,name,model,cat,brand,image,price}`. If Firebase is unreachable or config is blank, it falls back to the built-in `FALLBACK` array so the page still renders. Keep this fallback behavior.
+On load, `loadProducts()` creates a Supabase client from `CONFIG.supabase`, then reads the `products` table where `published = true` and maps rows to `{id,name,model,cat,brand,image,price}`. If Supabase is unreachable or config is blank, it falls back to the built-in `FALLBACK` array so the page still renders. Keep this fallback behavior.
 
 ## Config (top of the `<script>` block)
 ```js
 const CONFIG = {
   whatsapp: "2348119610718",
-  firebase: { apiKey:"", authDomain:"", projectId:"", storageBucket:"", messagingSenderId:"", appId:"" }
+  supabase: { url: "", anonKey: "" }
 };
 ```
-Firebase web config values are safe to expose; access is controlled by Firestore rules.
+Supabase URL and anon key are safe to expose; access is controlled by Row Level Security policies, not by hiding the config.
 
-## Database (Firestore)
-Collection `products`, one doc per product (doc id = product id). Public fields only:
-`name`, `model`, `category`, `brand`, `selling_price` (number), `image_url`, `published` (bool).
-Cost price is NOT stored here (Firestore rules are per-document, so a public collection cannot hide a single field). Keep cost data out of this collection.
-Rules (`fb/firestore.rules`): public may READ published products, no client WRITES. Edits happen in the Firebase console or via `fb/seed/seed.js` (admin SDK). Seed with `fb/seed/products.json`.
+## Database (Supabase Postgres)
+Table `products`, one row per product (`id` = product code, primary key). Public columns only:
+`name`, `model`, `category`, `brand`, `selling_price` (numeric), `image_url`, `published` (boolean).
+Cost price is NOT stored here — keep cost and margin records in a separate, non-public sheet.
+Policies (`supabase/schema.sql`): public may SELECT published products, and may UPDATE only the `image_url` column of an existing row (via `admin.html`'s photo uploader — no login by deliberate choice, so this is enforced at the database layer: no other column, no insert, no delete, is possible from the browser). Bulk edits happen in the Supabase dashboard's Table Editor or via `supabase/seed/seed.js` (service-role key, bypasses RLS). Seed with `supabase/seed/products.json`.
+
+## Photo uploads (`admin.html`)
+A second static file, not linked from the storefront, for the owner to drop in product photos. Naming convention: the image filename (without extension) must equal the product's ID, e.g. `TV001.jpg`. It uploads to the `products` Storage bucket and writes the resulting public URL into that product's `image_url` — no manual Firestore/Postgres editing needed. No login; the write surface is instead locked down by `supabase/schema.sql`'s policies and the bucket's file-size/MIME-type limits. Keep the admin.html URL private.
 
 ## Design system (keep consistent, inspired by the 3legant look: clean, white, airy)
 Colors:
@@ -50,11 +54,10 @@ Style rules:
 
 ## Roadmap (not built yet)
 - Persona bundle view: First Nest, Bachelor Pad, Her Space, New Home, Shortlet Host, each with Essential / Signature / Bespoke tiers.
-- Real product photos via `image_url`.
-- A nicer custom admin page on top of Supabase (later), possibly customer accounts and saved orders.
+- Customer accounts and saved orders.
 
 ## Don'ts
 - Do not invent business claims (no "free shipping", "Stripe payments", "30 days money-back") unless the owner confirms them.
 - Do not add a checkout or payment step. Ordering is WhatsApp only.
 - Do not use em dashes in any user-facing copy.
-- Keep it a single static file unless explicitly asked to scaffold a larger app.
+- Keep the storefront a single static file (`index.html`) unless explicitly asked to scaffold a larger app; `admin.html` is the one standing exception.

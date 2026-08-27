@@ -8,8 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
     --ink:#14213A; --paper:#FFFFFF; --soft:#F4F5F7; --soft2:#EDEFF3;
@@ -319,16 +318,12 @@
    ============================================================ */
 const CONFIG = {
   whatsapp: "2348119610718",
-  // Your Firebase web app config. In Firebase console:
-  // Project settings > General > Your apps > Web app > SDK setup > Config.
-  // These values are safe to expose; Firestore rules control access.
-  firebase: {
-    apiKey: "AIzaSyA0QuGMBAMIGfQbrXCVVBGy0zCDPro2Yfw",
-    authDomain: "mr-available.firebaseapp.com",
-    projectId: "mr-available",
-    storageBucket: "mr-available.firebasestorage.app",
-    messagingSenderId: "549740208803",
-    appId: "1:549740208803:web:4bf02316a76ff97bf29516"
+  // Your Supabase project. In Supabase dashboard:
+  // Project settings > API > Project URL, and the "anon public" key.
+  // These values are safe to expose; Row Level Security controls access.
+  supabase: {
+    url: "",
+    anonKey: ""
   }
 };
 
@@ -392,29 +387,26 @@ const boxSVG = '<svg width="42" height="42" viewBox="0 0 24 24" fill="none" stro
 let PRODUCTS=[], CATS=["All"], state={cat:"All",q:"",bundle:{},open:false};
 
 async function loadProducts(){
-  const fb = CONFIG.firebase || {};
-  if(fb.projectId && fb.apiKey){
+  const sb = CONFIG.supabase || {};
+  if(sb.url && sb.anonKey){
     try{
-      if(!firebase.apps.length) firebase.initializeApp(fb);
-      const db = firebase.firestore();
-      const snap = await db.collection("products").where("published","==",true).get();
-      const items = snap.docs.map(d=>{
-        const r = d.data();
-        return {
-          id: d.id,
-          name: String(r.name||"").trim(),
-          model: String(r.model||"").trim(),
-          cat: String(r.category||"Other").trim(),
-          brand: String(r.brand||"").trim(),
-          image: String(r.image_url||"").trim(),
-          price: Number(r.selling_price)||0
-        };
-      }).filter(p=>p.id && p.name && p.price>0);
+      const client = supabase.createClient(sb.url, sb.anonKey);
+      const { data, error } = await client.from("products").select("*").eq("published", true);
+      if(error) throw error;
+      const items = (data||[]).map(r=>({
+        id: String(r.id||"").trim(),
+        name: String(r.name||"").trim(),
+        model: String(r.model||"").trim(),
+        cat: String(r.category||"Other").trim(),
+        brand: String(r.brand||"").trim(),
+        image: String(r.image_url||"").trim(),
+        price: Number(r.selling_price)||0
+      })).filter(p=>p.id && p.name && p.price>0);
       items.sort((a,b)=> a.cat.localeCompare(b.cat) || a.name.localeCompare(b.name));
       if(items.length) return { items, live:true };
       return { items: FALLBACK, live:false };
     }catch(e){
-      return { items: FALLBACK, live:false, warn:"Could not reach Firebase. Check the firebase config in CONFIG and that Firestore is enabled with the storefront rules. Showing sample data for now." };
+      return { items: FALLBACK, live:false, warn:"Could not reach Supabase. Check the Supabase URL and anon key in CONFIG, and that the products table and policies are set up. Showing sample data for now." };
     }
   }
   return { items: FALLBACK, live:false };
@@ -542,7 +534,7 @@ document.getElementById("footWa").href=helloLink;
   PRODUCTS=data;
   CATS=["All",...Array.from(new Set(PRODUCTS.map(p=>p.cat))).sort()];
   if(warn) document.getElementById("notice").innerHTML=`<div class="notice">${escapeHtml(warn)}</div>`;
-  else if(!live&&!(CONFIG.firebase&&CONFIG.firebase.projectId)) document.getElementById("notice").innerHTML=`<div class="notice">Preview mode: showing built-in sample data. Add your Firebase config in CONFIG to go live.</div>`;
+  else if(!live&&!(CONFIG.supabase&&CONFIG.supabase.url)) document.getElementById("notice").innerHTML=`<div class="notice">Preview mode: showing built-in sample data. Add your Supabase config in CONFIG to go live.</div>`;
   render();
 })();
 </script>

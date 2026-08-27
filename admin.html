@@ -8,9 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{--ink:#14213A;--paper:#FFFFFF;--soft:#F4F5F7;--line:#E6E9EE;--muted:#6C7480;--accent:#E79213;--price:#0E7C5A;--ok:#0E7C5A;--err:#C0392B}
   *{box-sizing:border-box}
@@ -72,29 +70,22 @@
 
 <script>
 const CONFIG = {
-  firebase: {
-    apiKey: "AIzaSyA0QuGMBAMIGfQbrXCVVBGy0zCDPro2Yfw",
-    authDomain: "mr-available.firebaseapp.com",
-    projectId: "mr-available",
-    storageBucket: "mr-available.firebasestorage.app",
-    messagingSenderId: "549740208803",
-    appId: "1:549740208803:web:4bf02316a76ff97bf29516"
+  // Same Supabase project as index.html.
+  supabase: {
+    url: "",
+    anonKey: ""
   }
 };
 
-if(!firebase.apps.length) firebase.initializeApp(CONFIG.firebase);
-const db = firebase.firestore();
-const storage = firebase.storage();
+const client = supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
 
 function escapeHtml(s){return String(s||"").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 
 let PRODUCTS = [];
 async function loadLookup(){
-  const snap = await db.collection("products").where("published","==",true).get();
-  PRODUCTS = snap.docs.map(d=>{
-    const r = d.data();
-    return { id: d.id, name: r.name||"", brand: r.brand||"" };
-  }).sort((a,b)=>a.id.localeCompare(b.id));
+  const { data, error } = await client.from("products").select("id,name,brand").eq("published", true).order("id");
+  if(error) throw error;
+  PRODUCTS = data||[];
   renderLookup("");
 }
 function renderLookup(q){
@@ -121,16 +112,22 @@ function addRow(file){
 async function uploadOne(id, file, statusEl){
   try{
     const ext = (file.name.match(/\.([^.]+)$/) || [,"jpg"])[1].toLowerCase();
-    const ref = storage.ref().child(`products/${id}.${ext}`);
-    await ref.put(file, { contentType: file.type || "image/jpeg" });
-    const url = await ref.getDownloadURL();
-    await db.collection("products").doc(id).update({ image_url: url });
+    const path = `${id}.${ext}`;
+    const { error: upErr } = await client.storage.from("products").upload(path, file, { upsert: true, contentType: file.type || "image/jpeg" });
+    if(upErr) throw upErr;
+    const { data: pub } = client.storage.from("products").getPublicUrl(path);
+    const url = pub.publicUrl + "?t=" + Date.now();
+    const { data, error: updErr } = await client.from("products").update({ image_url: url }).eq("id", id).select("id");
+    if(updErr) throw updErr;
+    if(!data || !data.length){
+      statusEl.textContent = `No product with ID "${id}" exists.`;
+      statusEl.className = "st err";
+      return;
+    }
     statusEl.textContent = "Done — attached to " + id;
     statusEl.className = "st ok";
   }catch(e){
-    statusEl.textContent = e.code === "not-found" || /No document to update/.test(e.message||"")
-      ? `No product with ID "${id}" exists in Firestore.`
-      : "Upload failed: " + (e.message || e);
+    statusEl.textContent = "Upload failed: " + (e.message || e);
     statusEl.className = "st err";
   }
 }
