@@ -8,159 +8,369 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--ink:#14213A;--paper:#FFFFFF;--soft:#F4F5F7;--soft2:#EDEFF3;--line:#E6E9EE;--muted:#6C7480;--accent:#E79213;--price:#0E7C5A;--wa:#25D366;--wa-dark:#1BAE56;}
-*{box-sizing:border-box}html,body{margin:0;padding:0}
-body{background:var(--paper);color:var(--ink);font-family:"Poppins",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5}
-a{color:inherit;text-decoration:none}button{font-family:inherit;cursor:pointer;border:none;background:none}img{display:block;max-width:100%}
-.wrap{max-width:1160px;margin:0 auto;padding:0 20px}.muted{color:var(--muted)}
-.announce{background:var(--ink);color:#fff;font-size:12.5px;text-align:center;padding:8px 16px;letter-spacing:.01em}.announce b{color:var(--accent);font-weight:600}
-header.top{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-.nav{height:64px;display:flex;align-items:center;justify-content:space-between;gap:16px}
-.logo{display:flex;align-items:baseline;gap:8px;font-weight:800;letter-spacing:-.02em}.logo .mr{background:var(--accent);color:var(--ink);font-size:12px;padding:2px 6px;border-radius:6px}.logo .nm{font-size:20px}.logo .nm b{color:var(--accent)}
-.navlinks{display:none;gap:28px;font-size:14px;font-weight:500}.navlinks a:hover{color:var(--accent)}
-.navright{display:flex;align-items:center;gap:10px}
-.iconbtn{height:40px;width:40px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:var(--ink)}.iconbtn:hover{background:var(--soft)}
-.cartbtn{position:relative;display:flex;align-items:center;gap:8px;background:var(--ink);color:#fff;font-weight:600;font-size:13.5px;padding:9px 16px;border-radius:999px}
-.cartbtn .badge{position:absolute;top:-6px;right:-6px;background:var(--accent);color:var(--ink);font-size:11px;font-weight:700;height:20px;min-width:20px;padding:0 5px;border-radius:999px;display:flex;align-items:center;justify-content:center}
-@media(min-width:900px){.navlinks{display:flex}}
-.hero{padding:56px 0 40px}.hero-grid{display:grid;gap:22px;grid-template-columns:1fr}@media(min-width:820px){.hero-grid{grid-template-columns:1.4fr 1fr;align-items:end}}
-h1.head{margin:0;font-weight:800;letter-spacing:-.035em;font-size:clamp(2.3rem,7vw,4.2rem);line-height:.98}h1.head .sl{color:var(--line);font-weight:500}h1.head .dot{color:var(--accent)}
-.lead{font-size:15px;color:var(--muted);max-width:420px;margin:0 0 18px}.cta-row{display:flex;flex-wrap:wrap;gap:10px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:14px;border-radius:999px;padding:12px 22px;transition:transform .12s ease,opacity .12s ease}.btn:active{transform:scale(.98)}
-.btn-dark{background:var(--ink);color:#fff}.btn-dark:hover{opacity:.9}.btn-wa{background:var(--wa);color:#fff}.btn-wa:hover{background:var(--wa-dark)}.btn-ghost{background:var(--soft);color:var(--ink)}.btn-ghost:hover{background:var(--soft2)}
-.sec{padding:34px 0}.sechead{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px;gap:16px}.sechead h2{margin:0;font-size:clamp(1.5rem,4vw,2.1rem);font-weight:800;letter-spacing:-.03em;line-height:1.05}
-.seeall{font-size:13.5px;font-weight:600;color:var(--ink);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}.seeall:hover{color:var(--accent)}
-.cats{display:grid;gap:12px;grid-template-columns:repeat(2,1fr)}@media(min-width:640px){.cats{grid-template-columns:repeat(3,1fr)}}@media(min-width:960px){.cats{grid-template-columns:repeat(5,1fr)}}
-.cat{background:var(--soft);border:1px solid transparent;border-radius:16px;padding:16px;text-align:left;display:flex;flex-direction:column;justify-content:space-between;min-height:104px;transition:background .14s ease,border-color .14s ease,transform .14s ease}.cat:hover{background:#fff;border-color:var(--line);transform:translateY(-2px)}
-.cat .cn{font-size:14px;font-weight:700;line-height:1.2}.cat .cc{font-size:12px;color:var(--muted);margin-top:2px}.cat .go{margin-top:14px;font-size:12px;font-weight:600;color:var(--accent);display:inline-flex;align-items:center;gap:5px}.cat.on{background:var(--ink)}.cat.on .cn,.cat.on .cc{color:#fff}.cat.on .cc{opacity:.7}
-.shopbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:18px}
-.search{flex:1;min-width:220px;display:flex;align-items:center;gap:8px;background:var(--soft);border:1px solid transparent;border-radius:999px;padding:11px 16px}.search:focus-within{background:#fff;border-color:var(--line)}.search input{border:none;outline:none;background:none;width:100%;font-size:14px;color:var(--ink);font-family:inherit}
-.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}.chip{white-space:nowrap;font-size:13px;font-weight:600;padding:8px 14px;border-radius:999px;background:var(--soft);color:var(--ink);flex:0 0 auto}.chip.on{background:var(--ink);color:#fff}
-.grid{display:grid;gap:16px;grid-template-columns:repeat(2,1fr)}@media(min-width:640px){.grid{grid-template-columns:repeat(3,1fr)}}@media(min-width:960px){.grid{grid-template-columns:repeat(4,1fr)}}
-.card{display:flex;flex-direction:column}.thumb{position:relative;background:var(--soft);border-radius:14px;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;overflow:hidden}.thumb img{width:100%;height:100%;object-fit:cover}
-.cat-tag{position:absolute;top:10px;left:10px;background:#fff;color:var(--muted);font-size:10.5px;font-weight:600;padding:3px 9px;border-radius:999px;border:1px solid var(--line)}
-.addover{position:absolute;left:10px;right:10px;bottom:10px;opacity:0;transform:translateY(6px);transition:all .16s ease}.card:hover .addover{opacity:1;transform:translateY(0)}.addover .btn{width:100%;padding:10px}
-.pbody{padding:12px 2px 0}.pname{font-size:13.5px;font-weight:600;line-height:1.3}.pmeta{font-size:11.5px;color:var(--muted);margin-top:3px}.pmodel{font-size:11px;color:var(--muted);margin-top:2px}.pmodel b{color:var(--ink);font-weight:600}
-.prow{display:flex;align-items:center;justify-content:space-between;margin-top:8px;gap:8px}.price{font-size:16px;font-weight:700;color:var(--price)}.qbtns{display:flex;align-items:center;gap:8px}
-.mini{height:34px;border-radius:999px;background:var(--ink);color:#fff;font-size:12.5px;font-weight:600;padding:0 14px;display:inline-flex;align-items:center;gap:6px}
-.stepper{display:flex;align-items:center;gap:2px;border:1px solid var(--ink);border-radius:999px;padding:0 4px}.stepper button{height:30px;width:28px;display:flex;align-items:center;justify-content:center;font-size:16px}.stepper .q{font-size:13px;font-weight:700;min-width:16px;text-align:center}
-.wabtn{height:34px;width:34px;border-radius:999px;background:var(--wa);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
-.empty{text-align:center;padding:56px 0;color:var(--muted);font-size:14px}
-.notice{background:#FFF7E6;border:1px solid #F3D488;color:#8A5A00;font-size:12.5px;border-radius:12px;padding:10px 14px;margin:14px 0 0}
-.band{background:var(--ink);border-radius:22px;padding:34px 26px;display:grid;gap:18px;grid-template-columns:1fr;align-items:center;color:#fff}@media(min-width:760px){.band{grid-template-columns:1.6fr auto;padding:40px}}.band h3{margin:0 0 6px;font-size:clamp(1.4rem,3.6vw,2rem);font-weight:800;letter-spacing:-.02em}.band p{margin:0;color:rgba(255,255,255,.72);font-size:14px;max-width:460px}
-.trust{display:grid;gap:12px;grid-template-columns:repeat(2,1fr)}@media(min-width:760px){.trust{grid-template-columns:repeat(4,1fr)}}.tcell{background:var(--soft);border-radius:14px;padding:18px}.tcell .tt{font-size:13.5px;font-weight:700;margin-top:8px}.tcell .td{font-size:12px;color:var(--muted);margin-top:2px}
-footer{background:var(--ink);color:#fff;margin-top:40px}.fgrid{display:grid;gap:26px;grid-template-columns:1fr;padding:44px 0 26px}@media(min-width:760px){.fgrid{grid-template-columns:1.4fr 1fr 1fr}}
-.fbrand .nm{font-weight:800;font-size:20px;letter-spacing:-.02em}.fbrand .nm b{color:var(--accent)}.fbrand p{color:rgba(255,255,255,.6);font-size:13px;margin:10px 0 0;max-width:280px}
-.fcol h4{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.55);margin:0 0 12px;font-weight:600}.fcol a{display:block;font-size:13.5px;color:rgba(255,255,255,.85);padding:5px 0}.fcol a:hover{color:var(--accent)}
-.fbar{border-top:1px solid rgba(255,255,255,.12);padding:16px 0;font-size:12px;color:rgba(255,255,255,.55);display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px}
-.barwrap{position:fixed;left:0;right:0;bottom:0;z-index:35;padding:10px 16px 16px;background:linear-gradient(to top,#fff 62%,transparent);pointer-events:none}.barwrap.show{pointer-events:auto}
-.bar{max-width:1160px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;background:var(--ink);color:#fff;border-radius:16px;padding:14px 20px;box-shadow:0 12px 34px rgba(20,33,58,.28)}.bar .l{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px}.bar .r{font-weight:800}.bar .r small{font-weight:500;opacity:.8;font-size:12px}
-.overlay{position:fixed;inset:0;z-index:50;background:rgba(20,33,58,.5);display:flex;align-items:flex-end;justify-content:center}@media(min-width:640px){.overlay{align-items:center}}
-.drawer{width:100%;max-width:460px;background:#fff;border-radius:24px 24px 0 0;max-height:86vh;display:flex;flex-direction:column}@media(min-width:640px){.drawer{border-radius:24px}}
-.dhead{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--line)}.dhead h2{margin:0;font-size:19px;font-weight:800}
-.xbtn{height:34px;width:34px;border-radius:999px;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:15px}
-.dbody{flex:1;overflow-y:auto;padding:6px 22px}.ditem{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}.ditem .dn{font-size:14px;font-weight:600;line-height:1.3}.ditem .dp{font-size:11.5px;color:var(--muted);margin-top:2px}
-.dfoot{padding:14px 22px 22px;border-top:1px solid var(--line)}.tot{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.tot .tl{font-size:14px;color:var(--muted)}.tot .tv{font-size:22px;font-weight:800}
-.send{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--wa);color:#fff;font-weight:700;border-radius:999px;padding:15px;font-size:15px}.fine{text-align:center;font-size:11.5px;color:var(--muted);margin-top:8px}.hidden{display:none}
+  :root{
+    --ink:#14213A; --paper:#FFFFFF; --soft:#F4F5F7; --soft2:#EDEFF3;
+    --line:#E6E9EE; --muted:#6C7480; --accent:#E79213; --price:#0E7C5A;
+    --wa:#25D366; --wa-dark:#1BAE56;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);
+    font-family:"Poppins",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit;cursor:pointer;border:none;background:none}
+  img{display:block;max-width:100%}
+  .wrap{max-width:1160px;margin:0 auto;padding:0 20px}
+  .muted{color:var(--muted)}
+
+  /* announcement */
+  .announce{background:var(--ink);color:#fff;font-size:12.5px;text-align:center;padding:8px 16px;letter-spacing:.01em}
+  .announce b{color:var(--accent);font-weight:600}
+
+  /* header */
+  header.top{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .nav{height:64px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .logo{display:flex;align-items:baseline;gap:8px;font-weight:800;letter-spacing:-.02em}
+  .logo .mr{background:var(--accent);color:var(--ink);font-size:12px;padding:2px 6px;border-radius:6px}
+  .logo .nm{font-size:20px}
+  .logo .nm b{color:var(--accent)}
+  .navlinks{display:none;gap:28px;font-size:14px;font-weight:500}
+  .navlinks a:hover{color:var(--accent)}
+  .navright{display:flex;align-items:center;gap:10px}
+  .iconbtn{height:40px;width:40px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:var(--ink)}
+  .iconbtn:hover{background:var(--soft)}
+  .cartbtn{position:relative;display:flex;align-items:center;gap:8px;background:var(--ink);color:#fff;font-weight:600;font-size:13.5px;padding:9px 16px;border-radius:999px}
+  .cartbtn .badge{position:absolute;top:-6px;right:-6px;background:var(--accent);color:var(--ink);font-size:11px;font-weight:700;height:20px;min-width:20px;padding:0 5px;border-radius:999px;display:flex;align-items:center;justify-content:center}
+  @media(min-width:900px){.navlinks{display:flex}}
+
+  /* hero */
+  .hero{padding:56px 0 40px}
+  .hero-grid{display:grid;gap:22px;grid-template-columns:1fr}
+  @media(min-width:820px){.hero-grid{grid-template-columns:1.4fr 1fr;align-items:end}}
+  h1.head{margin:0;font-weight:800;letter-spacing:-.035em;font-size:clamp(2.3rem,7vw,4.2rem);line-height:.98}
+  h1.head .sl{color:var(--line);font-weight:500}
+  h1.head .dot{color:var(--accent)}
+  .lead{font-size:15px;color:var(--muted);max-width:420px;margin:0 0 18px}
+  .cta-row{display:flex;flex-wrap:wrap;gap:10px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:14px;border-radius:999px;padding:12px 22px;transition:transform .12s ease,opacity .12s ease}
+  .btn:active{transform:scale(.98)}
+  .btn-dark{background:var(--ink);color:#fff}
+  .btn-dark:hover{opacity:.9}
+  .btn-wa{background:var(--wa);color:#fff}
+  .btn-wa:hover{background:var(--wa-dark)}
+  .btn-ghost{background:var(--soft);color:var(--ink)}
+  .btn-ghost:hover{background:var(--soft2)}
+
+  /* section head */
+  .sec{padding:34px 0}
+  .sechead{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px;gap:16px}
+  .sechead h2{margin:0;font-size:clamp(1.5rem,4vw,2.1rem);font-weight:800;letter-spacing:-.03em;line-height:1.05}
+  .seeall{font-size:13.5px;font-weight:600;color:var(--ink);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+  .seeall:hover{color:var(--accent)}
+
+  /* category tiles */
+  .cats{display:grid;gap:12px;grid-template-columns:repeat(2,1fr)}
+  @media(min-width:640px){.cats{grid-template-columns:repeat(3,1fr)}}
+  @media(min-width:960px){.cats{grid-template-columns:repeat(5,1fr)}}
+  .cat{background:var(--soft);border:1px solid transparent;border-radius:16px;padding:16px;text-align:left;display:flex;flex-direction:column;justify-content:space-between;min-height:104px;transition:background .14s ease,border-color .14s ease,transform .14s ease}
+  .cat:hover{background:#fff;border-color:var(--line);transform:translateY(-2px)}
+  .cat .cn{font-size:14px;font-weight:700;line-height:1.2}
+  .cat .cc{font-size:12px;color:var(--muted);margin-top:2px}
+  .cat .go{margin-top:14px;font-size:12px;font-weight:600;color:var(--accent);display:inline-flex;align-items:center;gap:5px}
+  .cat.on{background:var(--ink)}
+  .cat.on .cn,.cat.on .cc{color:#fff}
+  .cat.on .cc{opacity:.7}
+
+  /* shop controls */
+  .shopbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:18px}
+  .search{flex:1;min-width:220px;display:flex;align-items:center;gap:8px;background:var(--soft);border:1px solid transparent;border-radius:999px;padding:11px 16px}
+  .search:focus-within{background:#fff;border-color:var(--line)}
+  .search input{border:none;outline:none;background:none;width:100%;font-size:14px;color:var(--ink);font-family:inherit}
+  .chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{white-space:nowrap;font-size:13px;font-weight:600;padding:8px 14px;border-radius:999px;background:var(--soft);color:var(--ink);flex:0 0 auto}
+  .chip.on{background:var(--ink);color:#fff}
+
+  /* product grid */
+  .grid{display:grid;gap:16px;grid-template-columns:repeat(2,1fr)}
+  @media(min-width:640px){.grid{grid-template-columns:repeat(3,1fr)}}
+  @media(min-width:960px){.grid{grid-template-columns:repeat(4,1fr)}}
+  .card{display:flex;flex-direction:column}
+  .thumb{position:relative;background:var(--soft);border-radius:14px;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .thumb img{width:100%;height:100%;object-fit:cover}
+  .cat-tag{position:absolute;top:10px;left:10px;background:#fff;color:var(--muted);font-size:10.5px;font-weight:600;padding:3px 9px;border-radius:999px;border:1px solid var(--line)}
+  .addover{position:absolute;left:10px;right:10px;bottom:10px;opacity:0;transform:translateY(6px);transition:all .16s ease}
+  .card:hover .addover{opacity:1;transform:translateY(0)}
+  .addover .btn{width:100%;padding:10px}
+  .pbody{padding:12px 2px 0}
+  .pname{font-size:13.5px;font-weight:600;line-height:1.3}
+  .pmeta{font-size:11.5px;color:var(--muted);margin-top:3px}
+  .pmodel{font-size:11px;color:var(--muted);margin-top:2px}
+  .pmodel b{color:var(--ink);font-weight:600}
+  .prow{display:flex;align-items:center;justify-content:space-between;margin-top:8px;gap:8px}
+  .price{font-size:16px;font-weight:700;color:var(--price)}
+  .qbtns{display:flex;align-items:center;gap:8px}
+  .mini{height:34px;border-radius:999px;background:var(--ink);color:#fff;font-size:12.5px;font-weight:600;padding:0 14px;display:inline-flex;align-items:center;gap:6px}
+  .stepper{display:flex;align-items:center;gap:2px;border:1px solid var(--ink);border-radius:999px;padding:0 4px}
+  .stepper button{height:30px;width:28px;display:flex;align-items:center;justify-content:center;font-size:16px}
+  .stepper .q{font-size:13px;font-weight:700;min-width:16px;text-align:center}
+  .wabtn{height:34px;width:34px;border-radius:999px;background:var(--wa);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .empty{text-align:center;padding:56px 0;color:var(--muted);font-size:14px}
+  .notice{background:#FFF7E6;border:1px solid #F3D488;color:#8A5A00;font-size:12.5px;border-radius:12px;padding:10px 14px;margin:14px 0 0}
+
+  /* WhatsApp band */
+  .band{background:var(--ink);border-radius:22px;padding:34px 26px;display:grid;gap:18px;grid-template-columns:1fr;align-items:center;color:#fff}
+  @media(min-width:760px){.band{grid-template-columns:1.6fr auto;padding:40px}}
+  .band h3{margin:0 0 6px;font-size:clamp(1.4rem,3.6vw,2rem);font-weight:800;letter-spacing:-.02em}
+  .band p{margin:0;color:rgba(255,255,255,.72);font-size:14px;max-width:460px}
+
+  /* trust */
+  .trust{display:grid;gap:12px;grid-template-columns:repeat(2,1fr)}
+  @media(min-width:760px){.trust{grid-template-columns:repeat(4,1fr)}}
+  .tcell{background:var(--soft);border-radius:14px;padding:18px}
+  .tcell .tt{font-size:13.5px;font-weight:700;margin-top:8px}
+  .tcell .td{font-size:12px;color:var(--muted);margin-top:2px}
+
+  /* footer */
+  footer{background:var(--ink);color:#fff;margin-top:40px}
+  .fgrid{display:grid;gap:26px;grid-template-columns:1fr;padding:44px 0 26px}
+  @media(min-width:760px){.fgrid{grid-template-columns:1.4fr 1fr 1fr}}
+  .fbrand .nm{font-weight:800;font-size:20px;letter-spacing:-.02em}
+  .fbrand .nm b{color:var(--accent)}
+  .fbrand p{color:rgba(255,255,255,.6);font-size:13px;margin:10px 0 0;max-width:280px}
+  .fcol h4{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.55);margin:0 0 12px;font-weight:600}
+  .fcol a{display:block;font-size:13.5px;color:rgba(255,255,255,.85);padding:5px 0}
+  .fcol a:hover{color:var(--accent)}
+  .fbar{border-top:1px solid rgba(255,255,255,.12);padding:16px 0;font-size:12px;color:rgba(255,255,255,.55);display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px}
+
+  /* sticky bundle bar + drawer */
+  .barwrap{position:fixed;left:0;right:0;bottom:0;z-index:35;padding:10px 16px 16px;background:linear-gradient(to top,#fff 62%,transparent);pointer-events:none}
+  .barwrap.show{pointer-events:auto}
+  .bar{max-width:1160px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;background:var(--ink);color:#fff;border-radius:16px;padding:14px 20px;box-shadow:0 12px 34px rgba(20,33,58,.28)}
+  .bar .l{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px}
+  .bar .r{font-weight:800}
+  .bar .r small{font-weight:500;opacity:.8;font-size:12px}
+  .overlay{position:fixed;inset:0;z-index:50;background:rgba(20,33,58,.5);display:flex;align-items:flex-end;justify-content:center}
+  @media(min-width:640px){.overlay{align-items:center}}
+  .drawer{width:100%;max-width:460px;background:#fff;border-radius:24px 24px 0 0;max-height:86vh;display:flex;flex-direction:column}
+  @media(min-width:640px){.drawer{border-radius:24px}}
+  .dhead{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--line)}
+  .dhead h2{margin:0;font-size:19px;font-weight:800}
+  .xbtn{height:34px;width:34px;border-radius:999px;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:15px}
+  .dbody{flex:1;overflow-y:auto;padding:6px 22px}
+  .ditem{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
+  .ditem .dn{font-size:14px;font-weight:600;line-height:1.3}
+  .ditem .dp{font-size:11.5px;color:var(--muted);margin-top:2px}
+  .dfoot{padding:14px 22px 22px;border-top:1px solid var(--line)}
+  .tot{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .tot .tl{font-size:14px;color:var(--muted)}
+  .tot .tv{font-size:22px;font-weight:800}
+  .send{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--wa);color:#fff;font-weight:700;border-radius:999px;padding:15px;font-size:15px}
+  .fine{text-align:center;font-size:11.5px;color:var(--muted);margin-top:8px}
+  .hidden{display:none}
 </style>
 </head>
 <body>
+
 <div class="announce">In stock and ready · order in one tap on <b>WhatsApp</b></div>
-<header class="top"><div class="wrap nav">
-<a class="logo" href="#top"><span class="mr">MR</span><span class="nm">AVAILABLE<b>.</b></span></a>
-<nav class="navlinks"><a href="#shop">Shop</a><a href="#categories">Categories</a><a href="#contact">Contact</a></nav>
-<div class="navright">
-<button class="iconbtn" id="searchToggle" title="Search"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></button>
-<button class="cartbtn" id="openBundle"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>Bundle <span class="badge hidden" id="badge">0</span></button>
-</div></div></header>
+
+<header class="top">
+  <div class="wrap nav">
+    <a class="logo" href="#top"><span class="mr">MR</span><span class="nm">AVAILABLE<b>.</b></span></a>
+    <nav class="navlinks">
+      <a href="#shop">Shop</a>
+      <a href="#categories">Categories</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <div class="navright">
+      <button class="iconbtn" id="searchToggle" title="Search">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      </button>
+      <button class="cartbtn" id="openBundle">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        Bundle <span class="badge hidden" id="badge">0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
 <a id="top"></a>
-<section class="wrap hero"><div class="hero-grid">
-<h1 class="head">Everything for the home<span class="sl">/</span><br>in stock, priced fair<span class="dot">.</span></h1>
-<div><p class="lead">MR AVAILABLE is your home appliances and electronics store. Browse real stock, build a bundle, and order in one tap on WhatsApp.</p>
-<div class="cta-row"><a class="btn btn-dark" href="#shop">Shop all</a>
-<a class="btn btn-wa" id="heroWa" target="_blank" rel="noreferrer"><svg width="17" height="17" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2Z"/></svg>Chat with us</a></div></div>
-</div></section>
-<section class="wrap sec" id="categories"><div class="sechead"><h2>Shop by category</h2><a class="seeall" href="#shop" onclick="setCat('All')">View all →</a></div><div class="cats" id="catGrid"></div></section>
-<section class="wrap sec" id="shop"><div class="sechead"><h2 id="shopTitle">All products</h2><span class="seeall" id="shopCount"></span></div>
-<div class="shopbar"><div class="search" id="searchBox"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6C7480" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input id="search" placeholder="Search brand, item, model, size..." /></div><div class="chips" id="chips"></div></div>
-<div class="grid" id="grid"></div><div class="empty hidden" id="empty">Nothing matches that yet. Try another category or clear the search.</div><div id="notice"></div></section>
-<section class="wrap sec"><div class="band"><div><h3>Ready to order?</h3><p>Build your bundle above, or message us straight away. We reply fast and confirm everything before you pay.</p></div>
-<a class="btn btn-wa" id="bandWa" target="_blank" rel="noreferrer" style="padding:14px 24px"><svg width="17" height="17" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2Z"/></svg>Message us on WhatsApp</a></div></section>
-<section class="wrap sec"><div class="trust">
-<div class="tcell"><div class="tt">Real stock</div><div class="td">What you see is what we have</div></div>
-<div class="tcell"><div class="tt">Fair prices</div><div class="td">Clear pricing, no games</div></div>
-<div class="tcell"><div class="tt">Order on WhatsApp</div><div class="td">One tap, fast replies</div></div>
-<div class="tcell"><div class="tt">Confirm before you pay</div><div class="td">We agree everything first</div></div>
-</div></section>
-<footer id="contact"><div class="wrap fgrid">
-<div class="fbrand"><div class="nm">MR AVAILABLE<b>.</b></div><p>Home appliances and electronics. Real stock, fair prices, ordered on WhatsApp.</p></div>
-<div class="fcol"><h4>Shop</h4><a href="#shop" onclick="setCat('Television')">Televisions</a><a href="#shop" onclick="setCat('Air Conditioner')">Air Conditioners</a><a href="#shop" onclick="setCat('Washing Machine')">Washing Machines</a><a href="#shop" onclick="setCat('Generator')">Generators</a><a href="#shop" onclick="setCat('All')">See everything</a></div>
-<div class="fcol"><h4>Order</h4><a id="footWa" target="_blank" rel="noreferrer">Message us on WhatsApp</a><a href="#top">Back to top</a></div>
-</div><div class="wrap fbar"><span>© 2026 MR AVAILABLE. All rights reserved.</span><span>Built for fast WhatsApp ordering.</span></div></footer>
-<div class="barwrap hidden" id="barwrap"><button class="bar" id="openBundle2"><span class="l"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span id="barCount">0 items</span> in bundle</span><span class="r"><span id="barTotal">₦0</span> <small>review</small></span></button></div>
-<div class="overlay hidden" id="overlay"><div class="drawer"><div class="dhead"><h2>Your bundle</h2><button class="xbtn" id="closeBundle">✕</button></div><div class="dbody" id="dbody"></div>
-<div class="dfoot hidden" id="dfoot"><div class="tot"><span class="tl">Total</span><span class="tv" id="drawerTotal">₦0</span></div>
-<a class="send" id="sendBtn" target="_blank" rel="noreferrer"><svg width="19" height="19" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2Z"/></svg>Send bundle on WhatsApp</a>
-<p class="fine">Opens a ready-made message. You confirm before anyone pays.</p></div></div></div>
-<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<section class="wrap hero">
+  <div class="hero-grid">
+    <h1 class="head">Everything for the home<span class="sl">/</span><br>in stock, priced fair<span class="dot">.</span></h1>
+    <div>
+      <p class="lead">MR AVAILABLE is your home appliances and electronics store. Browse real stock, build a bundle, and order in one tap on WhatsApp.</p>
+      <div class="cta-row">
+        <a class="btn btn-dark" href="#shop">Shop all</a>
+        <a class="btn btn-wa" id="heroWa" target="_blank" rel="noreferrer">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2Zm5.6 14.2c-.2.6-1.2 1.2-1.7 1.2-.4 0-1 .1-3.2-.9-2.7-1.2-4.4-4-4.5-4.2-.1-.2-1-1.4-1-2.6 0-1.2.6-1.8.9-2 .2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6c-.1.2-.3.3-.1.6.1.3.7 1.1 1.4 1.7.9.8 1.6 1 1.9 1.2.2.1.4.1.5-.1l.7-.8c.2-.2.3-.2.6-.1l1.9.9c.2.1.4.2.5.3.1.3.1.7-.1 1.1Z"/></svg>
+          Chat with us
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap sec" id="categories">
+  <div class="sechead">
+    <h2>Shop by category</h2>
+    <a class="seeall" href="#shop" onclick="setCat('All')">View all →</a>
+  </div>
+  <div class="cats" id="catGrid"></div>
+</section>
+
+<section class="wrap sec" id="shop">
+  <div class="sechead">
+    <h2 id="shopTitle">All products</h2>
+    <span class="seeall" id="shopCount"></span>
+  </div>
+  <div class="shopbar">
+    <div class="search" id="searchBox">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6C7480" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="search" placeholder="Search brand, item, model, size..." />
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="empty hidden" id="empty">Nothing matches that yet. Try another category or clear the search.</div>
+  <div id="notice"></div>
+</section>
+
+<section class="wrap sec">
+  <div class="band">
+    <div>
+      <h3>Ready to order?</h3>
+      <p>Build your bundle above, or message us straight away. We reply fast and confirm everything before you pay.</p>
+    </div>
+    <a class="btn btn-wa" id="bandWa" target="_blank" rel="noreferrer" style="padding:14px 24px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2Zm5.6 14.2c-.2.6-1.2 1.2-1.7 1.2-.4 0-1 .1-3.2-.9-2.7-1.2-4.4-4-4.5-4.2-.1-.2-1-1.4-1-2.6 0-1.2.6-1.8.9-2 .2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6c-.1.2-.3.3-.1.6.1.3.7 1.1 1.4 1.7.9.8 1.6 1 1.9 1.2.2.1.4.1.5-.1l.7-.8c.2-.2.3-.2.6-.1l1.9.9c.2.1.4.2.5.3.1.3.1.7-.1 1.1Z"/></svg>
+      Message us on WhatsApp
+    </a>
+  </div>
+</section>
+
+<section class="wrap sec">
+  <div class="trust">
+    <div class="tcell"><div class="tt">Real stock</div><div class="td">What you see is what we have</div></div>
+    <div class="tcell"><div class="tt">Fair prices</div><div class="td">Clear pricing, no games</div></div>
+    <div class="tcell"><div class="tt">Order on WhatsApp</div><div class="td">One tap, fast replies</div></div>
+    <div class="tcell"><div class="tt">Confirm before you pay</div><div class="td">We agree everything first</div></div>
+  </div>
+</section>
+
+<footer id="contact">
+  <div class="wrap fgrid">
+    <div class="fbrand">
+      <div class="nm">MR AVAILABLE<b>.</b></div>
+      <p>Home appliances and electronics. Real stock, fair prices, ordered on WhatsApp.</p>
+    </div>
+    <div class="fcol">
+      <h4>Shop</h4>
+      <a href="#shop" onclick="setCat('Television')">Televisions</a>
+      <a href="#shop" onclick="setCat('Air Conditioner')">Air Conditioners</a>
+      <a href="#shop" onclick="setCat('Washing Machine')">Washing Machines</a>
+      <a href="#shop" onclick="setCat('Generator')">Generators</a>
+      <a href="#shop" onclick="setCat('All')">See everything</a>
+    </div>
+    <div class="fcol">
+      <h4>Order</h4>
+      <a id="footWa" target="_blank" rel="noreferrer">Message us on WhatsApp</a>
+      <a href="#top">Back to top</a>
+    </div>
+  </div>
+  <div class="wrap fbar">
+    <span>© 2026 MR AVAILABLE. All rights reserved.</span>
+    <span>Built for fast WhatsApp ordering.</span>
+  </div>
+</footer>
+
+<div class="barwrap hidden" id="barwrap">
+  <button class="bar" id="openBundle2">
+    <span class="l">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <span id="barCount">0 items</span> in bundle
+    </span>
+    <span class="r"><span id="barTotal">₦0</span> <small>review</small></span>
+  </button>
+</div>
+
+<div class="overlay hidden" id="overlay">
+  <div class="drawer">
+    <div class="dhead"><h2>Your bundle</h2><button class="xbtn" id="closeBundle">✕</button></div>
+    <div class="dbody" id="dbody"></div>
+    <div class="dfoot hidden" id="dfoot">
+      <div class="tot"><span class="tl">Total</span><span class="tv" id="drawerTotal">₦0</span></div>
+      <a class="send" id="sendBtn" target="_blank" rel="noreferrer">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2Zm5.6 14.2c-.2.6-1.2 1.2-1.7 1.2-.4 0-1 .1-3.2-.9-2.7-1.2-4.4-4-4.5-4.2-.1-.2-1-1.4-1-2.6 0-1.2.6-1.8.9-2 .2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6c-.1.2-.3.3-.1.6.1.3.7 1.1 1.4 1.7.9.8 1.6 1 1.9 1.2.2.1.4.1.5-.1l.7-.8c.2-.2.3-.2.6-.1l1.9.9c.2.1.4.2.5.3.1.3.1.7-.1 1.1Z"/></svg>
+        Send bundle on WhatsApp
+      </a>
+      <p class="fine">Opens a ready-made message. You confirm before anyone pays.</p>
+    </div>
+  </div>
+</div>
+
 <script>
+/* ============================================================
+   CONFIG  —  edit these two lines, nothing else
+   ============================================================ */
 const CONFIG = {
   whatsapp: "2348119610718",
-  firebase: {
-    apiKey: "AIzaSyA0QuGMBAMIGfQbrXCVVBGy0zCDPro2Yfw",
-    authDomain: "mr-available.firebaseapp.com",
-    projectId: "mr-available",
-    storageBucket: "mr-available.firebasestorage.app",
-    messagingSenderId: "549740208803",
-    appId: "1:549740208803:web:4bf02316a76ff97bf29516"
+  // Your Supabase project. In Supabase dashboard:
+  // Project settings > API > Project URL, and the "anon public" key.
+  // These values are safe to expose; Row Level Security controls access.
+  supabase: {
+    url: "https://eqwkbosrgaxsgqluakuo.supabase.co",
+    anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxd2tib3NyZ2F4c2dxbHVha3VvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4MzE1MDAsImV4cCI6MjEwMzQwNzUwMH0.li8Qxm_t1o3dG0xxQNV9_kwL0Cyfo88qfZ0OKZEAlHE"
   }
 };
-const FALLBACK=[
+
+const FALLBACK = [
   {id:"COOK001",name:"Gas Cooker 4-Burner All Gas Standing (Black)",model:"",cat:"Cookers",brand:"Nexus",price:199000,image:""},
   {id:"COOK002",name:"Gas Cooker 3 Gas + 1 Electric Standing (Black)",model:"",cat:"Cookers",brand:"Nexus",price:205000,image:""},
-  {id:"COOK003",name:"Gas Cooker 60x60 4-Burner All Gas Standing (Silver)",model:"",cat:"Cookers",brand:"Maxi",price:248000,image:""},
-  {id:"COOK004",name:"Gas Cooker 60x60 Standing Formica Wood Finish",model:"",cat:"Cookers",brand:"Maxi",price:295000,image:""},
-  {id:"COOK005",name:"Gas Cooker 50x50 3 Gas + 1 Electric Auto-Ignition (Grey)",model:"",cat:"Cookers",brand:"Skyrun",price:179000,image:""},
+  {id:"COOK003",name:"Gas Cooker 60x60 4-Burner All Gas (Silver)",model:"",cat:"Cookers",brand:"Maxi",price:248000,image:""},
+  {id:"COOK004",name:"Gas Cooker 60x60 Formica Wood Finish",model:"",cat:"Cookers",brand:"Maxi",price:295000,image:""},
+  {id:"COOK005",name:"Gas Cooker 50x50 3 Gas + 1 Electric (Grey)",model:"",cat:"Cookers",brand:"Skyrun",price:179000,image:""},
   {id:"MICR001",name:"Microwave 20L Manual Knob (White)",model:"H20MOWS14",cat:"Microwaves",brand:"Hisense",price:99000,image:""},
   {id:"MICR002",name:"Microwave 20L Digital LED Automatic (Black)",model:"H20MOBS6",cat:"Microwaves",brand:"Hisense",price:114000,image:""},
   {id:"MICR003",name:"Microwave 20L Manual 700W Grill",model:"MG720CFB-B",cat:"Microwaves",brand:"Midea",price:149000,image:""},
   {id:"MICR004",name:"Microwave 20L Manual (Black)",model:"",cat:"Microwaves",brand:"Maxi",price:79900,image:""},
-  {id:"FAN001",name:"Standing Fan 18\"",model:"",cat:"Fans",brand:"Duravolt",price:30000,image:""},
-  {id:"FAN002",name:"Standing Fan 16\"",model:"",cat:"Fans",brand:"Binatone",price:65000,image:""},
-  {id:"FAN003",name:"Standing Rechargeable Fan 18\" AC/DC with Bluetooth",model:"",cat:"Fans",brand:"Qasa",price:128000,image:""},
-  {id:"FAN004",name:"Rechargeable Standing Fan 18\" AC/DC",model:"",cat:"Fans",brand:"Duravolt",price:110000,image:""},
-  {id:"FAN005",name:"Rechargeable Standing Fan 18\" AC/DC",model:"",cat:"Fans",brand:"Century",price:122000,image:""},
-  {id:"FAN006",name:"Standing Fan AC/DC 18\"",model:"",cat:"Fans",brand:"Qasa",price:63000,image:""},
-  {id:"FAN007",name:"Wall Fan AC/DC 16\"",model:"",cat:"Fans",brand:"Qasa",price:47000,image:""},
-  {id:"FAN008",name:"Wall Fan 18\"",model:"",cat:"Fans",brand:"Ox",price:37000,image:""},
-  {id:"TV001",name:"Smart TV 43\"",model:"",cat:"Television",brand:"Hisense",price:390000,image:""},
-  {id:"TV002",name:"QLED Smart TV 50\"",model:"",cat:"Television",brand:"Hisense",price:585000,image:""},
-  {id:"TV003",name:"QLED Smart TV 75\", Google TV",model:"",cat:"Television",brand:"TCL",price:1540000,image:""},
+  {id:"FAN001",name:'Standing Fan 18"',model:"",cat:"Fans",brand:"Duravolt",price:30000,image:""},
+  {id:"FAN002",name:'Standing Fan 16"',model:"",cat:"Fans",brand:"Binatone",price:65000,image:""},
+  {id:"FAN003",name:'Rechargeable Fan 18" AC/DC Bluetooth',model:"",cat:"Fans",brand:"Qasa",price:128000,image:""},
+  {id:"FAN004",name:'Rechargeable Standing Fan 18" AC/DC',model:"",cat:"Fans",brand:"Duravolt",price:110000,image:""},
+  {id:"FAN005",name:'Rechargeable Standing Fan 18" AC/DC',model:"",cat:"Fans",brand:"Century",price:122000,image:""},
+  {id:"FAN006",name:'Standing Fan AC/DC 18"',model:"",cat:"Fans",brand:"Qasa",price:63000,image:""},
+  {id:"FAN007",name:'Wall Fan AC/DC 16"',model:"",cat:"Fans",brand:"Qasa",price:47000,image:""},
+  {id:"FAN008",name:'Wall Fan 18"',model:"",cat:"Fans",brand:"Ox",price:37000,image:""},
+  {id:"TV001",name:'Smart TV 43"',model:"",cat:"Television",brand:"Hisense",price:390000,image:""},
+  {id:"TV002",name:'QLED Smart TV 50"',model:"",cat:"Television",brand:"Hisense",price:585000,image:""},
+  {id:"TV003",name:'QLED Smart TV 75" Google TV',model:"",cat:"Television",brand:"TCL",price:1540000,image:""},
   {id:"FRIDGE001",name:"Refrigerator/Freezer 142L",model:"180SH",cat:"Refrigerator",brand:"Hisense",price:330000,image:""},
   {id:"GEN001",name:"Generator 2.5 KVA, Aluminium Coil",model:"",cat:"Generator",brand:"Senwei",price:235000,image:""},
   {id:"GEN002",name:"Generator 2.5 KVA, Copper Coil",model:"Model 3000",cat:"Generator",brand:"Firman",price:415000,image:""},
   {id:"WM001",name:"Washing Machine 11kg",model:"",cat:"Washing Machine",brand:"Skyron",price:275000,image:""},
   {id:"WM002",name:"Washing Machine 11kg",model:"",cat:"Washing Machine",brand:"Hisense",price:350000,image:""},
-  {id:"WM003",name:"Washing Machine 7kg Twin Tub Semi-Automatic",model:"SPB-80E05S",cat:"Washing Machine",brand:"Skyron",price:199000,image:""},
+  {id:"WM003",name:"Washing Machine 7kg Twin Tub Semi-Auto",model:"SPB-80E05S",cat:"Washing Machine",brand:"Skyron",price:199000,image:""},
   {id:"WM004",name:"Washing Machine 7kg",model:"",cat:"Washing Machine",brand:"Hisense",price:230000,image:""},
   {id:"WM005",name:"Automatic Washing Machine 8kg",model:"",cat:"Washing Machine",brand:"Hisense",price:560000,image:""},
-  {id:"WM006",name:"Front Load Automatic Washing Machine 8kg",model:"",cat:"Washing Machine",brand:"Hisense",price:495000,image:""},
-  {id:"WM007",name:"Front Load Automatic Washing Machine 10kg",model:"HWD-100-BI-1495-9SB",cat:"Washing Machine",brand:"Hisense",price:1150000,image:""},
-  {id:"WM008",name:"Front Load Automatic Washing Machine 10kg",model:"HWD-100-BD-14979S",cat:"Washing Machine",brand:"Hisense",price:1220000,image:""},
-  {id:"WM009",name:"Top Load Automatic Washing Machine 8kg",model:"TL-8080FYS-6",cat:"Washing Machine",brand:"Haier Thermocool",price:480000,image:""},
-  {id:"WM010",name:"Top Load Automatic Washing Machine 10.5kg",model:"TL-105FYS-6",cat:"Washing Machine",brand:"Haier Thermocool",price:560000,image:""},
-  {id:"AF001",name:"Air Fryer 8.5L, LCD Touch Control",model:"",cat:"Air Fryer",brand:"Kenwood",price:75000,image:""},
+  {id:"WM006",name:"Front Load Automatic 8kg",model:"",cat:"Washing Machine",brand:"Hisense",price:495000,image:""},
+  {id:"WM007",name:"Front Load Automatic 10kg",model:"HWD-100-BI-1495-9SB",cat:"Washing Machine",brand:"Hisense",price:1150000,image:""},
+  {id:"WM008",name:"Front Load Automatic 10kg",model:"HWD-100-BD-14979S",cat:"Washing Machine",brand:"Hisense",price:1220000,image:""},
+  {id:"WM009",name:"Top Load Automatic 8kg",model:"TL-8080FYS-6",cat:"Washing Machine",brand:"Haier Thermocool",price:480000,image:""},
+  {id:"WM010",name:"Top Load Automatic 10.5kg",model:"TL-105FYS-6",cat:"Washing Machine",brand:"Haier Thermocool",price:560000,image:""},
+  {id:"AF001",name:"Air Fryer 8.5L, LCD Touch",model:"",cat:"Air Fryer",brand:"Kenwood",price:75000,image:""},
   {id:"FRZ001",name:"Inverter Chest Freezer 360L, Silver",model:"",cat:"Freezer",brand:"Hisense",price:799000,image:""},
   {id:"FRZ002",name:"Inverter Chest Freezer 360L, White",model:"",cat:"Freezer",brand:"Hisense",price:775000,image:""},
   {id:"FRZ003",name:"Inverter Chest Freezer 220-240L, Silver",model:"",cat:"Freezer",brand:"Media",price:499000,image:""},
   {id:"OVEN001",name:"Electric Oven 37L",model:"COV-8320C",cat:"Oven",brand:"Century",price:119900,image:""},
-  {id:"BLEND001",name:"Electric Blender 3-in-1, 2,000W",model:"",cat:"Blender",brand:"Century",price:99000,image:""},
+  {id:"BLEND001",name:"Electric Blender 3-in-1, 2000W",model:"",cat:"Blender",brand:"Century",price:99000,image:""},
   {id:"SND001",name:"Soundbar 580W, Wireless Subwoofer",model:"",cat:"Home Theatre",brand:"Hisense",price:355000,image:""},
   {id:"SND002",name:"Soundbar 240W, Dolby Atmos",model:"HS-2100FM",cat:"Home Theatre",brand:"Hisense",price:199000,image:""},
-  {id:"EXT001",name:"Extension Board, Pure Copper, Surge Protection",model:"",cat:"Extension Board",brand:"Smart England",price:13500,image:""},
-  {id:"EXT002",name:"Extension Board, USB, Surge Protection",model:"",cat:"Extension Board",brand:"Schneider",price:15000,image:""},
+  {id:"EXT001",name:"Extension Board, Surge Protection",model:"",cat:"Extension Board",brand:"Smart England",price:13500,image:""},
+  {id:"EXT002",name:"Extension Board, USB, Surge",model:"",cat:"Extension Board",brand:"Schneider",price:15000,image:""},
   {id:"STAB001",name:"Stabilizer 1,000W",model:"",cat:"Stabilizer",brand:"Duravolt",price:42000,image:""},
   {id:"STAB002",name:"Stabilizer 2,000W",model:"",cat:"Stabilizer",brand:"Century",price:92000,image:""},
   {id:"STAB003",name:"Stabilizer 5,000W",model:"",cat:"Stabilizer",brand:"Century",price:172000,image:""},
@@ -169,62 +379,109 @@ const FALLBACK=[
   {id:"AC003",name:"Inverter Air Conditioner 1 HP",model:"",cat:"Air Conditioner",brand:"Hisense",price:510000,image:""},
   {id:"AC004",name:"Inverter Air Conditioner 1.5 HP",model:"",cat:"Air Conditioner",brand:"Hisense",price:560000,image:""}
 ];
-const naira = n => "\u20a6" + Number(n||0).toLocaleString("en-NG");
-const boxSVG = `<svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#B4BCC7" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5V8Z"/><path d="M3 8l9 5 9-5"/><path d="M12 13v8"/></svg>`;
-const waSVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2Z"/></svg>`;
+
+const naira = n => "₦" + Number(n||0).toLocaleString("en-NG");
+const toNum = v => Number(String(v==null?"":v).replace(/[^0-9.]/g,"")) || 0;
+const boxSVG = '<svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#B4BCC7" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5V8Z"/><path d="M3 8l9 5 9-5"/><path d="M12 13v8"/></svg>';
+
 let PRODUCTS=[], CATS=["All"], state={cat:"All",q:"",bundle:{},open:false};
+
 async function loadProducts(){
-  const fb = CONFIG.firebase || {};
-  if(fb.apiKey && fb.projectId && typeof firebase !== "undefined"){
+  const sb = CONFIG.supabase || {};
+  if(sb.url && sb.anonKey){
     try{
-      if(!window.__fbApp){ window.__fbApp = firebase.initializeApp(fb); }
-      const db = firebase.firestore();
-      const snap = await db.collection("products").where("published","==",true).get();
-      const items = [];
-      snap.forEach(function(doc){
-        const r = doc.data();
-        const price = Number(r.selling_price)||0;
-        const name = String(r.name||"").trim();
-        if(!name || price<=0) return;
-        items.push({ id: doc.id, name: name, model: String(r.model||"").trim(), cat: String(r.category||"Other").trim(), brand: String(r.brand||"").trim(), image: String(r.image_url||"").trim(), price: price });
-      });
-      if(items.length) return { items: items, live: true };
-      return { items: FALLBACK, live:false, warn:"Connected to Firebase but no products found yet. Add products in Firestore, then reload. Showing sample data." };
-    }catch(e){ return { items: FALLBACK, live:false, warn:"Could not reach Firebase. Check your firebaseConfig in CONFIG. Showing sample data for now." }; }
+      const client = supabase.createClient(sb.url, sb.anonKey);
+      const { data, error } = await client.from("products").select("*").eq("published", true);
+      if(error) throw error;
+      const items = (data||[]).map(r=>({
+        id: String(r.id||"").trim(),
+        name: String(r.name||"").trim(),
+        model: String(r.model||"").trim(),
+        cat: String(r.category||"Other").trim(),
+        brand: String(r.brand||"").trim(),
+        image: String(r.image_url||"").trim(),
+        price: Number(r.selling_price)||0
+      })).filter(p=>p.id && p.name && p.price>0);
+      items.sort((a,b)=> a.cat.localeCompare(b.cat) || a.name.localeCompare(b.name));
+      if(items.length) return { items, live:true };
+      return { items: FALLBACK, live:false };
+    }catch(e){
+      return { items: FALLBACK, live:false, warn:"Could not reach Supabase. Check the Supabase URL and anon key in CONFIG, and that the products table and policies are set up. Showing sample data for now." };
+    }
   }
   return { items: FALLBACK, live:false };
 }
-function escapeHtml(s){var map={};map["&"]="&amp;";map["<"]="&lt;";map[">"]="&gt;";map[String.fromCharCode(34)]="&quot;";map[String.fromCharCode(39)]="&#39;";return String(s||"").replace(/[&<>"']/g,function(m){return map[m];});}
+
+function escapeHtml(s){return String(s||"").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+
 function renderCats(){
-  const counts={}; PRODUCTS.forEach(p=>counts[p.cat]=(counts[p.cat]||0)+1);
+  const counts={};
+  PRODUCTS.forEach(p=>counts[p.cat]=(counts[p.cat]||0)+1);
   const cats=Object.keys(counts).sort();
-  document.getElementById("catGrid").innerHTML = cats.map(c=>`<button class="cat ${c===state.cat?"on":""}" data-cat="${escapeHtml(c)}"><div><div class="cn">${escapeHtml(c)}</div><div class="cc">${counts[c]} item${counts[c]!==1?"s":""}</div></div><span class="go">Shop \u2192</span></button>`).join("");
+  document.getElementById("catGrid").innerHTML = cats.map(c=>`
+    <button class="cat ${c===state.cat?'on':''}" onclick="setCat('${c.replace(/'/g,"\\'")}')">
+      <div><div class="cn">${escapeHtml(c)}</div><div class="cc">${counts[c]} item${counts[c]!==1?'s':''}</div></div>
+      <span class="go">Shop →</span>
+    </button>`).join("");
 }
 function renderChips(){
-  document.getElementById("chips").innerHTML = CATS.map(c=>`<button class="chip ${c===state.cat?"on":""}" data-cat="${escapeHtml(c)}">${escapeHtml(c)}</button>`).join("");
+  document.getElementById("chips").innerHTML = CATS.map(c=>
+    `<button class="chip ${c===state.cat?'on':''}" onclick="setCat('${c.replace(/'/g,"\\'")}')">${escapeHtml(c)}</button>`
+  ).join("");
 }
 function render(){
   const q=state.q.trim().toLowerCase();
-  const shown=PRODUCTS.filter(p=>{ const okCat=state.cat==="All"||p.cat===state.cat; const okQ=!q||(p.brand+" "+p.name+" "+p.cat+" "+(p.model||"")).toLowerCase().includes(q); return okCat&&okQ; });
+  const shown=PRODUCTS.filter(p=>{
+    const okCat=state.cat==="All"||p.cat===state.cat;
+    const okQ=!q||(p.brand+" "+p.name+" "+p.cat+" "+(p.model||"")).toLowerCase().includes(q);
+    return okCat&&okQ;
+  });
   document.getElementById("shopTitle").textContent = state.cat==="All"?"All products":state.cat;
   document.getElementById("shopCount").textContent = shown.length+" item"+(shown.length!==1?"s":"");
+
   document.getElementById("grid").innerHTML = shown.map(p=>{
     const n=state.bundle[p.id]||0;
-    const thumb=p.image ? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" loading="lazy"/>` : boxSVG;
+    const thumb=p.image
+      ? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" loading="lazy" onerror="this.outerHTML='${boxSVG.replace(/'/g,'&#39;')}'"/>`
+      : boxSVG;
     const modelLine=p.model?`<div class="pmodel">Model <b>${escapeHtml(p.model)}</b></div>`:"";
-    const ctrl=n>0 ? `<div class="stepper"><button data-dec="${p.id}">\u2212</button><span class="q">${n}</span><button data-add="${p.id}">+</button></div>` : `<button class="mini" data-add="${p.id}">+ Add</button>`;
-    return `<article class="card"><div class="thumb">${thumb}<span class="cat-tag">${escapeHtml(p.cat)}</span><div class="addover"><button class="btn btn-dark" data-add="${p.id}">Add to bundle</button></div></div><div class="pbody"><div class="pname">${escapeHtml(p.name)}</div><div class="pmeta">${escapeHtml(p.brand)}</div>${modelLine}<div class="prow"><span class="price">${naira(p.price)}</span><span class="qbtns">${ctrl}<a class="wabtn" target="_blank" rel="noreferrer" href="${oneMsg(p)}" title="Buy on WhatsApp">${waSVG}</a></span></div></div></article>`;
+    const ctrl=n>0
+      ? `<div class="stepper"><button onclick="dec('${p.id}')">−</button><span class="q">${n}</span><button onclick="add('${p.id}')">+</button></div>`
+      : `<button class="mini" onclick="add('${p.id}')">+ Add</button>`;
+    return `<article class="card">
+      <div class="thumb">${thumb}<span class="cat-tag">${escapeHtml(p.cat)}</span>
+        <div class="addover"><button class="btn btn-dark" onclick="add('${p.id}')">Add to bundle</button></div>
+      </div>
+      <div class="pbody">
+        <div class="pname">${escapeHtml(p.name)}</div>
+        <div class="pmeta">${escapeHtml(p.brand)}</div>
+        ${modelLine}
+        <div class="prow">
+          <span class="price">${naira(p.price)}</span>
+          <span class="qbtns">${ctrl}
+            <a class="wabtn" target="_blank" rel="noreferrer" href="${oneMsg(p)}" title="Buy on WhatsApp">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2Zm5.6 14.2c-.2.6-1.2 1.2-1.7 1.2-.4 0-1 .1-3.2-.9-2.7-1.2-4.4-4-4.5-4.2-.1-.2-1-1.4-1-2.6 0-1.2.6-1.8.9-2 .2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6c-.1.2-.3.3-.1.6.1.3.7 1.1 1.4 1.7.9.8 1.6 1 1.9 1.2.2.1.4.1.5-.1l.7-.8c.2-.2.3-.2.6-.1l1.9.9c.2.1.4.2.5.3.1.3.1.7-.1 1.1Z"/></svg>
+            </a>
+          </span>
+        </div>
+      </div>
+    </article>`;
   }).join("");
   document.getElementById("empty").classList.toggle("hidden", shown.length>0);
   renderCats(); renderChips(); renderBundle();
 }
+
 function items(){return Object.entries(state.bundle).map(([id,qty])=>({p:PRODUCTS.find(x=>x.id===id),qty})).filter(x=>x.p);}
 function count(){return items().reduce((s,i)=>s+i.qty,0);}
 function total(){return items().reduce((s,i)=>s+i.p.price*i.qty,0);}
+
 function renderBundle(){
   const c=count();
-  const badge=document.getElementById("badge"); badge.textContent=c; badge.classList.toggle("hidden",c===0);
-  const bw=document.getElementById("barwrap"); bw.classList.toggle("hidden", c===0||state.open); bw.classList.toggle("show", c>0&&!state.open);
+  const badge=document.getElementById("badge");
+  badge.textContent=c; badge.classList.toggle("hidden",c===0);
+  const bw=document.getElementById("barwrap");
+  bw.classList.toggle("hidden", c===0||state.open);
+  bw.classList.toggle("show", c>0&&!state.open);
   document.getElementById("barCount").textContent=c+" item"+(c!==1?"s":"");
   document.getElementById("barTotal").textContent=naira(total());
   const body=document.getElementById("dbody"), list=items();
@@ -232,43 +489,52 @@ function renderBundle(){
     body.innerHTML=`<div class="empty">Your bundle is empty. Add a few items and send them to us in one message.</div>`;
     document.getElementById("dfoot").classList.add("hidden");
   }else{
-    body.innerHTML=list.map(function(o){var p=o.p,qty=o.qty; return `<div class="ditem"><div style="flex:1"><div class="dn">${escapeHtml(p.name)}</div><div class="dp">${p.model?("Model "+escapeHtml(p.model)+" \u00b7 "):""}${naira(p.price)} each</div></div><div class="stepper"><button data-dec="${p.id}">\u2212</button><span class="q">${qty}</span><button data-add="${p.id}">+</button></div><button class="xbtn" style="height:28px;width:28px" data-rm="${p.id}">\u2715</button></div>`;}).join("");
+    body.innerHTML=list.map(({p,qty})=>`
+      <div class="ditem">
+        <div style="flex:1"><div class="dn">${escapeHtml(p.name)}</div>
+        <div class="dp">${p.model?("Model "+escapeHtml(p.model)+" · "):""}${naira(p.price)} each</div></div>
+        <div class="stepper"><button onclick="dec('${p.id}')">−</button><span class="q">${qty}</span><button onclick="add('${p.id}')">+</button></div>
+        <button class="xbtn" style="height:28px;width:28px" onclick="removeItem('${p.id}')">✕</button>
+      </div>`).join("");
     document.getElementById("dfoot").classList.remove("hidden");
     document.getElementById("drawerTotal").textContent=naira(total());
     document.getElementById("sendBtn").href=bundleMsg();
   }
 }
+
 function waLink(msg){return `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`;}
 function oneMsg(p){return waLink(`Hello MR AVAILABLE, I want to buy:\n${p.name}${p.model?" (Model "+p.model+")":""}\nPrice: ${naira(p.price)}`);}
-function bundleMsg(){ const lines=items().map(function(i){return `${i.qty}x ${i.p.name}${i.p.model?" ("+i.p.model+")":""} - ${naira(i.p.price*i.qty)}`;}); return waLink(`Hello MR AVAILABLE, I want to order:\n${lines.join("\n")}\n\nTotal: ${naira(total())}`); }
+function bundleMsg(){
+  const lines=items().map(i=>`${i.qty}x ${i.p.name}${i.p.model?" ("+i.p.model+")":""} - ${naira(i.p.price*i.qty)}`);
+  return waLink(`Hello MR AVAILABLE, I want to order:\n${lines.join("\n")}\n\nTotal: ${naira(total())}`);
+}
+
 function add(id){state.bundle[id]=(state.bundle[id]||0)+1;render();}
 function dec(id){const n=(state.bundle[id]||0)-1;if(n<=0)delete state.bundle[id];else state.bundle[id]=n;render();}
 function removeItem(id){delete state.bundle[id];render();}
 function setCat(c){state.cat=c;render();const s=document.getElementById("shop");if(s)s.scrollIntoView({behavior:"smooth"});}
-document.addEventListener("click",function(e){
-  const t=e.target.closest("[data-add],[data-dec],[data-rm],[data-cat]"); if(!t) return;
-  if(t.hasAttribute("data-add")){add(t.getAttribute("data-add"));}
-  else if(t.hasAttribute("data-dec")){dec(t.getAttribute("data-dec"));}
-  else if(t.hasAttribute("data-rm")){removeItem(t.getAttribute("data-rm"));}
-  else if(t.hasAttribute("data-cat")){e.preventDefault();setCat(t.getAttribute("data-cat"));}
-});
-document.getElementById("search").addEventListener("input",function(e){state.q=e.target.value;render();});
-document.getElementById("searchToggle").onclick=function(){document.getElementById("shop").scrollIntoView({behavior:"smooth"});setTimeout(function(){document.getElementById("search").focus();},400);};
+window.add=add;window.dec=dec;window.removeItem=removeItem;window.setCat=setCat;
+
+document.getElementById("search").addEventListener("input",e=>{state.q=e.target.value;render();});
+document.getElementById("searchToggle").onclick=()=>{document.getElementById("shop").scrollIntoView({behavior:"smooth"});setTimeout(()=>document.getElementById("search").focus(),400);};
 function openBundle(){state.open=true;document.getElementById("overlay").classList.remove("hidden");renderBundle();}
 function closeBundle(){state.open=false;document.getElementById("overlay").classList.add("hidden");renderBundle();}
 document.getElementById("openBundle").onclick=openBundle;
 document.getElementById("openBundle2").onclick=openBundle;
 document.getElementById("closeBundle").onclick=closeBundle;
-document.getElementById("overlay").addEventListener("click",function(e){if(e.target.id==="overlay")closeBundle();});
+document.getElementById("overlay").addEventListener("click",e=>{if(e.target.id==="overlay")closeBundle();});
+
 const helloLink=waLink("Hello MR AVAILABLE, I have a question about your products.");
 document.getElementById("heroWa").href=helloLink;
 document.getElementById("bandWa").href=helloLink;
 document.getElementById("footWa").href=helloLink;
+
 (async function(){
-  const r=await loadProducts(); PRODUCTS=r.items;
-  CATS=["All"].concat(Array.from(new Set(PRODUCTS.map(function(p){return p.cat;}))).sort());
-  if(r.warn) document.getElementById("notice").innerHTML=`<div class="notice">${escapeHtml(r.warn)}</div>`;
-  else if(!r.live&&!(CONFIG.firebase&&CONFIG.firebase.apiKey)) document.getElementById("notice").innerHTML=`<div class="notice">Preview mode: showing built-in sample data. Add your Firebase config in CONFIG to go live.</div>`;
+  const {items:data,live,warn}=await loadProducts();
+  PRODUCTS=data;
+  CATS=["All",...Array.from(new Set(PRODUCTS.map(p=>p.cat))).sort()];
+  if(warn) document.getElementById("notice").innerHTML=`<div class="notice">${escapeHtml(warn)}</div>`;
+  else if(!live&&!(CONFIG.supabase&&CONFIG.supabase.url)) document.getElementById("notice").innerHTML=`<div class="notice">Preview mode: showing built-in sample data. Add your Supabase config in CONFIG to go live.</div>`;
   render();
 })();
 </script>
