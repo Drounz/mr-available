@@ -14,12 +14,13 @@ A storefront for MR AVAILABLE, a home appliances and electronics store in Nigeri
 On load, `loadProducts()` creates a Supabase client from `CONFIG.supabase`, then reads the `products` table where `published = true` and maps rows to `{id,name,model,cat,brand,image,images,price,description,personas}`. `images` is the ordered gallery array; `image` is `images[0]` (or `image_url` for any row not yet migrated to the array). If Supabase is unreachable or config is blank, it falls back to the built-in `FALLBACK` array so the page still renders. Keep this fallback behavior.
 
 ## Routing (no server, single file)
-The page has three views toggled by a URL query param, read client-side after `loadProducts()` resolves — no server routing needed on static hosting:
+Two "base" pages are toggled by a URL query param, read client-side after `loadProducts()` resolves — no server routing needed on static hosting:
 - default (`/`): the catalogue (`#catalogueView`)
-- `?p=<PRODUCT_ID>`: the product detail page (`#detailView`) — shareable link, works on direct load
 - `?persona=<slug>`: a persona collection view (`#personaView`)
 
-Navigation uses `history.pushState` (see `goTo()`); `popstate` re-runs `route()` so back/forward work. Card thumbnails and product names link to `?p=<id>`; persona tiles link to `?persona=<slug>`.
+A product page is not a third base page — it's a slide-over panel (`#productPanel` + `#panelBackdrop`) that overlays whichever base page is showing, toggled purely by `?p=<PRODUCT_ID>` on top of the current URL (e.g. `?persona=bachelor-pad&p=TV001`). Opening or closing it never re-renders or scrolls the base page underneath, so scroll position is preserved exactly.
+
+Navigation uses `history.pushState` (see `goTo()`, `goToProduct()`); `popstate` re-runs `route()`, which only switches/re-renders the base page when the base actually changes (comparing against `baseKey`) and independently shows/hides the panel based on `?p=`. A shared `?p=` link works on direct load: the bootstrap script splits it into two history entries (a bare base entry, then the full `?p=` entry) so the panel's close button and the browser Back button — both just call `history.back()` — always land back on-site instead of leaving it. Card thumbnails and product names call `goToProduct()`; persona tiles link to `?persona=<slug>`.
 
 ## Config (top of the `<script>` block)
 ```js

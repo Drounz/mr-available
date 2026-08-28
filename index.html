@@ -24,7 +24,7 @@
   button{font-family:inherit;cursor:pointer;border:none;background:none;min-height:44px}
   img{display:block;max-width:100%}
   svg,video{max-width:100%;height:auto}
-  .wrap{max-width:1160px;margin-left:auto;margin-right:auto;padding-left:20px;padding-right:20px}
+  .wrap{max-width:1160px;margin-left:auto;margin-right:auto;padding-left:12px;padding-right:12px}
   @media(min-width:640px){.wrap{padding-left:28px;padding-right:28px}}
   .muted{color:var(--muted)}
 
@@ -157,6 +157,7 @@
   .bar .r small{font-weight:500;opacity:.8;font-size:12px}
   .overlay{position:fixed;inset:0;z-index:50;background:rgba(20,33,58,.5);display:flex;align-items:flex-end;justify-content:center}
   @media(min-width:640px){.overlay{align-items:center}}
+  #galleryOverlay{z-index:70}
   .drawer{width:100%;max-width:460px;background:#fff;border-radius:24px 24px 0 0;max-height:86vh;padding-bottom:env(safe-area-inset-bottom);display:flex;flex-direction:column}
   @media(min-width:640px){.drawer{border-radius:24px}}
   .dhead{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--line)}
@@ -206,9 +207,15 @@
   /* persona tiles reuse .cat look; add a short blurb line */
   .persona-tile .cc{margin-top:2px}
 
-  /* product detail view */
-  .pd-grid{display:grid;gap:24px;grid-template-columns:1fr}
-  @media(min-width:820px){.pd-grid{grid-template-columns:1fr 1fr;align-items:start}}
+  /* product detail — slide-over panel */
+  #panelBackdrop{position:fixed;inset:0;z-index:60;background:rgba(20,33,58,.5);opacity:0;pointer-events:none;transition:opacity .22s ease}
+  #panelBackdrop.open{opacity:1;pointer-events:auto}
+  #productPanel{position:fixed;top:0;right:0;bottom:0;width:100%;max-width:100%;background:#fff;z-index:61;transform:translateX(100%);transition:transform .28s ease;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:-14px 0 34px rgba(20,33,58,.18)}
+  #productPanel.open{transform:translateX(0)}
+  @media(min-width:640px){#productPanel{max-width:460px}}
+  .panel-head{position:sticky;top:0;display:flex;justify-content:flex-end;padding:14px 16px;background:#fff;border-bottom:1px solid var(--line);z-index:1}
+  .panel-body{padding:8px 20px 28px}
+  .pd-grid{display:grid;gap:20px;grid-template-columns:1fr}
   .pd-hero{position:relative;background:var(--soft);border-radius:18px;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:zoom-in}
   .pd-hero img{width:100%;height:100%;object-fit:cover}
   .pd-thumbs{display:flex;gap:8px;overflow-x:auto;margin-top:10px;-webkit-overflow-scrolling:touch}
@@ -216,9 +223,9 @@
   .pd-thumb img{width:100%;height:100%;object-fit:cover}
   .pd-thumb.on{border-color:var(--ink)}
   .pd-cat{position:static;display:inline-block;margin-bottom:10px;top:auto;left:auto}
-  .pd-name{margin:0 0 6px;font-size:clamp(1.4rem,3.4vw,2rem);font-weight:800;letter-spacing:-.02em;line-height:1.15}
+  .pd-name{margin:0 0 6px;font-size:clamp(1.3rem,3.4vw,1.7rem);font-weight:800;letter-spacing:-.02em;line-height:1.15}
   .pd-meta{font-size:13.5px;color:var(--muted);margin-bottom:12px}
-  .pd-price{font-size:clamp(1.5rem,3vw,1.9rem);font-weight:800;color:var(--price);margin-bottom:14px}
+  .pd-price{font-size:clamp(1.4rem,3vw,1.7rem);font-weight:800;color:var(--price);margin-bottom:14px}
   .pd-desc{font-size:14px;color:var(--ink);line-height:1.6;margin:0 0 20px}
   .pd-actions{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}
   .pd-actions .btn{flex:1 1 200px}
@@ -348,30 +355,35 @@
 </section>
 </div>
 
-<div class="wrap sec hidden" id="detailView">
-  <a class="seeall" href="." onclick="return backToShop(event)">← Back to shop</a>
-  <div class="pd-grid" style="margin-top:18px">
-    <div class="pd-gallery">
-      <div class="pd-hero" id="pdHeroWrap"><img id="pdHeroImg" alt="" /></div>
-      <div class="pd-thumbs" id="pdThumbs"></div>
-    </div>
-    <div class="pd-info">
-      <span class="cat-tag pd-cat" id="pdCat"></span>
-      <h1 class="pd-name" id="pdName"></h1>
-      <div class="pd-meta" id="pdBrandModel"></div>
-      <div class="pd-price" id="pdPrice"></div>
-      <p class="pd-desc hidden" id="pdDesc"></p>
-      <div class="pd-actions" id="pdActions">
-        <a class="btn btn-wa" id="pdWaBtn" target="_blank" rel="noreferrer">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2Zm5.6 14.2c-.2.6-1.2 1.2-1.7 1.2-.4 0-1 .1-3.2-.9-2.7-1.2-4.4-4-4.5-4.2-.1-.2-1-1.4-1-2.6 0-1.2.6-1.8.9-2 .2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6c-.1.2-.3.3-.1.6.1.3.7 1.1 1.4 1.7.9.8 1.6 1 1.9 1.2.2.1.4.1.5-.1l.7-.8c.2-.2.3-.2.6-.1l1.9.9c.2.1.4.2.5.3.1.3.1.7-.1 1.1Z"/></svg>
-          Order this on WhatsApp
-        </a>
-        <button class="btn btn-dark" id="pdAddBtn">Add to bundle</button>
+<div id="panelBackdrop" onclick="closePanel()"></div>
+<div id="productPanel" role="dialog" aria-modal="true" aria-label="Product details">
+  <div class="panel-head">
+    <button class="xbtn" id="panelCloseBtn" aria-label="Close">✕</button>
+  </div>
+  <div class="panel-body">
+    <div class="pd-grid">
+      <div class="pd-gallery">
+        <div class="pd-hero" id="pdHeroWrap"><img id="pdHeroImg" alt="" /></div>
+        <div class="pd-thumbs" id="pdThumbs"></div>
       </div>
-      <button class="pd-copy" id="pdCopyBtn">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        <span id="pdCopyLabel">Copy link</span>
-      </button>
+      <div class="pd-info">
+        <span class="cat-tag pd-cat" id="pdCat"></span>
+        <h1 class="pd-name" id="pdName"></h1>
+        <div class="pd-meta" id="pdBrandModel"></div>
+        <div class="pd-price" id="pdPrice"></div>
+        <p class="pd-desc hidden" id="pdDesc"></p>
+        <div class="pd-actions" id="pdActions">
+          <a class="btn btn-wa" id="pdWaBtn" target="_blank" rel="noreferrer">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2Zm5.6 14.2c-.2.6-1.2 1.2-1.7 1.2-.4 0-1 .1-3.2-.9-2.7-1.2-4.4-4-4.5-4.2-.1-.2-1-1.4-1-2.6 0-1.2.6-1.8.9-2 .2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6c-.1.2-.3.3-.1.6.1.3.7 1.1 1.4 1.7.9.8 1.6 1 1.9 1.2.2.1.4.1.5-.1l.7-.8c.2-.2.3-.2.6-.1l1.9.9c.2.1.4.2.5.3.1.3.1.7-.1 1.1Z"/></svg>
+            Order this on WhatsApp
+          </a>
+          <button class="btn btn-dark" id="pdAddBtn">Add to bundle</button>
+        </div>
+        <button class="pd-copy" id="pdCopyBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span id="pdCopyLabel">Copy link</span>
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -743,25 +755,64 @@ const PERSONAS=[
 ];
 
 function qp(k){return new URLSearchParams(location.search).get(k);}
-function showView(view){
-  document.getElementById("catalogueView").classList.toggle("hidden",view!=="catalogue");
-  document.getElementById("detailView").classList.toggle("hidden",view!=="detail");
-  document.getElementById("personaView").classList.toggle("hidden",view!=="persona");
-}
 function goTo(url){history.pushState({},"",url);route();}
 function backToShop(e){if(e)e.preventDefault();goTo(location.pathname);return false;}
-function goToProduct(e,id){if(e)e.preventDefault();goTo("?p="+encodeURIComponent(id));return false;}
+function goToProduct(e,id){
+  if(e)e.preventDefault();
+  // Keep whatever base page (catalogue or a persona collection) is
+  // already showing — opening the panel only ever adds/changes ?p=.
+  const params=new URLSearchParams(location.search);
+  params.set("p",id);
+  goTo("?"+params.toString());
+  return false;
+}
 function goToPersona(e,slug){if(e)e.preventDefault();goTo("?persona="+encodeURIComponent(slug));return false;}
 window.backToShop=backToShop;window.goToProduct=goToProduct;window.goToPersona=goToPersona;
 
+/* The catalogue and a persona collection are the two "base" pages, swapped
+   full-page. The product panel is a separate overlay layered on top of
+   whichever base page is showing, toggled purely by the ?p= param, so
+   opening/closing it never re-renders or scrolls the base page underneath. */
+let baseKey=null;
 function route(){
   const pid=qp("p"), persona=qp("persona");
-  if(pid){renderDetail(pid);showView("detail");}
-  else if(persona){renderPersonaView(persona);showView("persona");}
-  else{showView("catalogue");render();}
-  window.scrollTo(0,0);
+  const newBaseKey = persona ? "persona:"+persona : "catalogue";
+  if(newBaseKey!==baseKey){
+    document.getElementById("catalogueView").classList.toggle("hidden",!!persona);
+    document.getElementById("personaView").classList.toggle("hidden",!persona);
+    if(persona) renderPersonaView(persona); else render();
+    baseKey=newBaseKey;
+    window.scrollTo(0,0);
+  }
+  if(pid) openPanelUI(pid); else closePanelUI();
 }
 window.addEventListener("popstate",route);
+
+const DEFAULT_TITLE=document.title;
+function openPanelUI(id){
+  renderDetail(id);
+  document.getElementById("productPanel").classList.add("open");
+  document.getElementById("panelBackdrop").classList.add("open");
+  document.body.style.overflow="hidden";
+}
+function closePanelUI(){
+  document.getElementById("productPanel").classList.remove("open");
+  document.getElementById("panelBackdrop").classList.remove("open");
+  document.body.style.overflow="";
+  document.title=DEFAULT_TITLE;
+}
+function closePanel(e){
+  if(e)e.preventDefault();
+  if(qp("p")) history.back();
+  return false;
+}
+window.closePanel=closePanel;
+document.getElementById("panelCloseBtn").onclick=closePanel;
+document.addEventListener("keydown",e=>{
+  if(e.key!=="Escape")return;
+  if(!document.getElementById("galleryOverlay").classList.contains("hidden"))return;
+  closePanel();
+});
 
 function renderPersonaTiles(){
   document.getElementById("personaGrid").innerHTML=PERSONAS.map(ps=>`
@@ -859,6 +910,18 @@ function renderDetail(id){
   else if(!live&&!(CONFIG.supabase&&CONFIG.supabase.url)) document.getElementById("notice").innerHTML=`<div class="notice">Preview mode: showing built-in sample data. Add your Supabase config in CONFIG to go live.</div>`;
   renderPersonaTiles();
   renderBrandWall();
+  // A shared ?p= link opens straight into the panel with nothing of ours
+  // behind it in history, so closing it (Back or the X) would leave the
+  // site. Split it into two entries first: a bare base entry, then the
+  // full ?p= entry on top, so "Back" always has somewhere on-site to land.
+  if(qp("p")){
+    const full=location.pathname+location.search;
+    const baseParams=new URLSearchParams(location.search);
+    baseParams.delete("p");
+    const baseUrl=location.pathname+(baseParams.toString()?("?"+baseParams.toString()):"");
+    history.replaceState({},"",baseUrl);
+    history.pushState({},"",full);
+  }
   route();
 })();
 </script>
