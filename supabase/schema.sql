@@ -30,30 +30,33 @@ create policy "Public read published products"
   to anon, authenticated
   using (published = true);
 
--- admin.html (signed-in owner only): may read every product, including
--- unpublished placeholders, so the photo uploader's product picker
--- shows the full catalog, not just what's already live.
+-- admin.html's product picker needs to show unpublished placeholders
+-- too, and there's no login gating it, so anyone with the anon key can
+-- read the full catalog (no cost data is stored here, so the exposure
+-- is just names/brands/categories of unpublished items).
 drop policy if exists "Owner may read all products" on products;
-create policy "Owner may read all products"
+drop policy if exists "Anyone may read all products" on products;
+create policy "Anyone may read all products"
   on products for select
-  to authenticated
+  to anon, authenticated
   using (true);
 
--- Writes now require a signed-in owner (Supabase Auth), not just anyone
--- with the admin.html link. Only the image columns are grantable, so
--- even a signed-in session can't touch price, name, or published.
+-- No login by deliberate choice: anyone with the admin.html link may
+-- write, but the column grant below means images/image_url are the
+-- ONLY columns they can actually change — no price, name, or published
+-- edits are possible from the browser. No insert/delete policy exists,
+-- so creating or deleting products from the browser is denied outright.
 drop policy if exists "Public may update image_url only" on products;
-revoke update on products from anon, authenticated;
-
 drop policy if exists "Owner may update product photos" on products;
-create policy "Owner may update product photos"
+drop policy if exists "Public may update product photos" on products;
+create policy "Public may update product photos"
   on products for update
-  to authenticated
+  to anon, authenticated
   using (true)
   with check (true);
 
-revoke update on products from authenticated;
-grant update (images, image_url) on products to authenticated;
+revoke update on products from anon, authenticated;
+grant update (images, image_url) on products to anon, authenticated;
 
 -- No insert/delete policy for anyone from the browser: denied outright.
 
@@ -68,25 +71,27 @@ create policy "Public read product photos"
   to public
   using (bucket_id = 'products');
 
--- Uploads, overwrites, and deletes now require the signed-in owner.
-drop policy if exists "Public upload product photos" on storage.objects;
-drop policy if exists "Public overwrite product photos" on storage.objects;
-
+-- Uploads, overwrites, and deletes are open (no login), scoped to the
+-- products bucket only; the bucket's size/MIME-type limits above still
+-- apply to every upload regardless of who makes it.
 drop policy if exists "Owner upload product photos" on storage.objects;
-create policy "Owner upload product photos"
+drop policy if exists "Public upload product photos" on storage.objects;
+create policy "Public upload product photos"
   on storage.objects for insert
-  to authenticated
+  to public
   with check (bucket_id = 'products');
 
 drop policy if exists "Owner overwrite product photos" on storage.objects;
-create policy "Owner overwrite product photos"
+drop policy if exists "Public overwrite product photos" on storage.objects;
+create policy "Public overwrite product photos"
   on storage.objects for update
-  to authenticated
+  to public
   using (bucket_id = 'products')
   with check (bucket_id = 'products');
 
 drop policy if exists "Owner delete product photos" on storage.objects;
-create policy "Owner delete product photos"
+drop policy if exists "Public delete product photos" on storage.objects;
+create policy "Public delete product photos"
   on storage.objects for delete
-  to authenticated
+  to public
   using (bucket_id = 'products');

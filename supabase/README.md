@@ -16,13 +16,8 @@ Files (drop these into the repo):
 ## 2. Run the schema
 1. In the Supabase dashboard, open **SQL Editor > New query**.
 2. Paste the contents of `supabase/schema.sql` and click **Run**.
-   This creates the `products` table (including the `images` gallery column), the storage bucket for photos, and the security policies: the public can read published products; only a signed-in owner can read every product or touch photos, and even then never price, name, or published status, and never create or delete products, from the browser.
+   This creates the `products` table (including the `images` gallery column), the storage bucket for photos, and the security policies: anyone can read every product and upload/change product photos, but never touch price, name, or published status, and never create or delete products, from the browser. No login is required by deliberate choice — `admin.html` has no sign-in, so keep its URL private.
    This file is safe to re-run any time it changes (e.g. after an update to this repo) — every statement is idempotent.
-
-## 2b. Create your owner login
-`admin.html` requires signing in — this is what protects photo uploads now that anyone with the link previously could.
-1. Dashboard: **Authentication > Users > Add user**. Set an email and password (autoconfirm the user, or confirm via the email Supabase sends).
-2. That's the login you'll use on `admin.html`. Keep the password somewhere safe; there's no self-serve password reset flow wired up.
 
 ## 3. Load your 50 products
 1. Dashboard: **Project settings > API**. Copy the **service_role** key (this bypasses Row Level Security — never put it in `index.html` or `admin.html`, and never commit it).
@@ -33,7 +28,7 @@ Files (drop these into the repo):
 ## 4. Connect the site and turn on photo uploads
 1. Dashboard: **Project settings > API**. Copy the **Project URL** and the **anon public** key (not the service_role key — this one is safe to expose).
 2. In both `index.html` and `admin.html`, paste them into `CONFIG.supabase` (`url` and `anonKey`).
-3. `admin.html` is part of the deployed site (e.g. `yoursite.com/admin.html`) but not linked from the storefront. Sign in with the owner account from step 2b, search for a product, and drop in one or more photos — any filename works, since photos live in a folder per product (`products/<PRODUCT_ID>/...` in Storage) rather than needing to match the ID themselves. The first photo is the card image; add more for a gallery. Delete and reorder buttons appear on each thumbnail.
+3. `admin.html` is part of the deployed site (e.g. `yoursite.com/admin.html`) but not linked from the storefront and has no login — keep the link to yourself. Search for a product and drop in one or more photos — any filename works, since photos live in a folder per product (`products/<PRODUCT_ID>/...` in Storage) rather than needing to match the ID themselves. The first photo is the card image; add more for a gallery. Delete and reorder buttons appear on each thumbnail.
 
 These config values are safe in a public repo. Security is enforced by Row Level Security, not by hiding the config.
 
