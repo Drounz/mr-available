@@ -186,6 +186,43 @@
   .gdots{display:flex;justify-content:center;gap:6px;margin-top:12px}
   .gdot{height:7px;width:7px;border-radius:999px;background:var(--line)}
   .gdot.on{background:var(--accent);width:16px}
+
+  /* trust strip (top) */
+  .trust-strip{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:center;padding:14px 0;font-size:12.5px;color:var(--muted);border-bottom:1px solid var(--line);border-top:1px solid var(--line)}
+  .trust-strip span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+  .trust-strip svg{flex:0 0 auto;color:var(--price)}
+
+  /* brand wall */
+  .brandwall{display:flex;flex-wrap:wrap;gap:10px 14px;justify-content:center;padding:8px 0}
+  .brandchip{font-size:13px;font-weight:700;letter-spacing:.02em;color:var(--muted);padding:10px 18px;background:var(--soft);border-radius:999px}
+
+  /* how to order steps */
+  .steps{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr))}
+  @media(min-width:760px){.steps{grid-template-columns:repeat(4,minmax(0,1fr))}}
+  .step{background:var(--soft);border-radius:14px;padding:18px}
+  .step .stepnum{display:inline-flex;align-items:center;justify-content:center;height:26px;width:26px;border-radius:999px;background:var(--ink);color:#fff;font-size:12px;font-weight:700;margin-bottom:10px}
+  .step .st{font-size:13.5px;font-weight:600;line-height:1.35}
+
+  /* persona tiles reuse .cat look; add a short blurb line */
+  .persona-tile .cc{margin-top:2px}
+
+  /* product detail view */
+  .pd-grid{display:grid;gap:24px;grid-template-columns:1fr}
+  @media(min-width:820px){.pd-grid{grid-template-columns:1fr 1fr;align-items:start}}
+  .pd-hero{position:relative;background:var(--soft);border-radius:18px;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:zoom-in}
+  .pd-hero img{width:100%;height:100%;object-fit:cover}
+  .pd-thumbs{display:flex;gap:8px;overflow-x:auto;margin-top:10px;-webkit-overflow-scrolling:touch}
+  .pd-thumb{flex:0 0 auto;height:64px;width:64px;border-radius:10px;overflow:hidden;background:var(--soft);border:2px solid transparent;padding:0}
+  .pd-thumb img{width:100%;height:100%;object-fit:cover}
+  .pd-thumb.on{border-color:var(--ink)}
+  .pd-cat{position:static;display:inline-block;margin-bottom:10px;top:auto;left:auto}
+  .pd-name{margin:0 0 6px;font-size:clamp(1.4rem,3.4vw,2rem);font-weight:800;letter-spacing:-.02em;line-height:1.15}
+  .pd-meta{font-size:13.5px;color:var(--muted);margin-bottom:12px}
+  .pd-price{font-size:clamp(1.5rem,3vw,1.9rem);font-weight:800;color:var(--price);margin-bottom:14px}
+  .pd-desc{font-size:14px;color:var(--ink);line-height:1.6;margin:0 0 20px}
+  .pd-actions{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+  .pd-actions .btn{flex:1 1 200px}
+  .pd-copy{font-size:12.5px;font-weight:600;color:var(--ink);background:var(--soft);border-radius:999px;padding:10px 16px;display:inline-flex;align-items:center;gap:6px;min-height:44px}
 </style>
 </head>
 <body>
@@ -213,6 +250,7 @@
 </header>
 
 <a id="top"></a>
+<div id="catalogueView">
 <section class="wrap hero">
   <div class="hero-grid">
     <h1 class="head">Everything for the home<span class="sl">/</span><br>in stock, priced fair<span class="dot">.</span></h1>
@@ -227,6 +265,20 @@
       </div>
     </div>
   </div>
+</section>
+
+<div class="trust-strip">
+  <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Genuine products</span>
+  <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Real stock</span>
+  <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Order on WhatsApp</span>
+  <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Confirm before you pay</span>
+</div>
+
+<section class="wrap sec" id="personas">
+  <div class="sechead">
+    <h2>Shop by what you need</h2>
+  </div>
+  <div class="cats" id="personaGrid"></div>
 </section>
 
 <section class="wrap sec" id="categories">
@@ -268,6 +320,25 @@
 </section>
 
 <section class="wrap sec">
+  <div class="sechead">
+    <h2>Brands we stock</h2>
+  </div>
+  <div class="brandwall" id="brandWall"></div>
+</section>
+
+<section class="wrap sec">
+  <div class="sechead">
+    <h2>How to order</h2>
+  </div>
+  <div class="steps">
+    <div class="step"><span class="stepnum">1</span><div class="st">Browse and pick what you need</div></div>
+    <div class="step"><span class="stepnum">2</span><div class="st">Build a bundle or open a product</div></div>
+    <div class="step"><span class="stepnum">3</span><div class="st">Send it to us on WhatsApp</div></div>
+    <div class="step"><span class="stepnum">4</span><div class="st">We confirm and arrange delivery</div></div>
+  </div>
+</section>
+
+<section class="wrap sec">
   <div class="trust">
     <div class="tcell"><div class="tt">Real stock</div><div class="td">What you see is what we have</div></div>
     <div class="tcell"><div class="tt">Fair prices</div><div class="td">Clear pricing, no games</div></div>
@@ -275,6 +346,49 @@
     <div class="tcell"><div class="tt">Confirm before you pay</div><div class="td">We agree everything first</div></div>
   </div>
 </section>
+</div>
+
+<div class="wrap sec hidden" id="detailView">
+  <a class="seeall" href="." onclick="return backToShop(event)">← Back to shop</a>
+  <div class="pd-grid" style="margin-top:18px">
+    <div class="pd-gallery">
+      <div class="pd-hero" id="pdHeroWrap"><img id="pdHeroImg" alt="" /></div>
+      <div class="pd-thumbs" id="pdThumbs"></div>
+    </div>
+    <div class="pd-info">
+      <span class="cat-tag pd-cat" id="pdCat"></span>
+      <h1 class="pd-name" id="pdName"></h1>
+      <div class="pd-meta" id="pdBrandModel"></div>
+      <div class="pd-price" id="pdPrice"></div>
+      <p class="pd-desc hidden" id="pdDesc"></p>
+      <div class="pd-actions" id="pdActions">
+        <a class="btn btn-wa" id="pdWaBtn" target="_blank" rel="noreferrer">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2Zm5.6 14.2c-.2.6-1.2 1.2-1.7 1.2-.4 0-1 .1-3.2-.9-2.7-1.2-4.4-4-4.5-4.2-.1-.2-1-1.4-1-2.6 0-1.2.6-1.8.9-2 .2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6c-.1.2-.3.3-.1.6.1.3.7 1.1 1.4 1.7.9.8 1.6 1 1.9 1.2.2.1.4.1.5-.1l.7-.8c.2-.2.3-.2.6-.1l1.9.9c.2.1.4.2.5.3.1.3.1.7-.1 1.1Z"/></svg>
+          Order this on WhatsApp
+        </a>
+        <button class="btn btn-dark" id="pdAddBtn">Add to bundle</button>
+      </div>
+      <button class="pd-copy" id="pdCopyBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <span id="pdCopyLabel">Copy link</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap sec hidden" id="personaView">
+  <a class="seeall" href="." onclick="return backToShop(event)">← Back to shop</a>
+  <div class="sechead" style="margin-top:18px">
+    <h2 id="personaTitle"></h2>
+  </div>
+  <p class="lead" id="personaDesc"></p>
+  <div class="grid" id="personaGridItems"></div>
+  <div class="empty hidden" id="personaEmpty">No products set up for this collection yet — check back soon.</div>
+  <a class="btn btn-wa hidden" id="personaSendBtn" target="_blank" rel="noreferrer" style="margin-top:20px">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2Zm5.6 14.2c-.2.6-1.2 1.2-1.7 1.2-.4 0-1 .1-3.2-.9-2.7-1.2-4.4-4-4.5-4.2-.1-.2-1-1.4-1-2.6 0-1.2.6-1.8.9-2 .2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6c-.1.2-.3.3-.1.6.1.3.7 1.1 1.4 1.7.9.8 1.6 1 1.9 1.2.2.1.4.1.5-.1l.7-.8c.2-.2.3-.2.6-.1l1.9.9c.2.1.4.2.5.3.1.3.1.7-.1 1.1Z"/></svg>
+    Send this set on WhatsApp
+  </a>
+</div>
 
 <footer id="contact">
   <div class="wrap fgrid">
@@ -432,7 +546,9 @@ async function loadProducts(){
           brand: String(r.brand||"").trim(),
           image: images[0]||"",
           images,
-          price: Number(r.selling_price)||0
+          price: Number(r.selling_price)||0,
+          description: String(r.description||"").trim(),
+          personas: Array.isArray(r.personas) ? r.personas.map(x=>String(x||"").trim()).filter(Boolean) : []
         };
       }).filter(p=>p.id && p.name && p.price>0);
       items.sort((a,b)=> a.cat.localeCompare(b.cat) || a.name.localeCompare(b.name));
@@ -462,6 +578,35 @@ function renderChips(){
     `<button class="chip ${c===state.cat?'on':''}" onclick="setCat('${c.replace(/'/g,"\\'")}')">${escapeHtml(c)}</button>`
   ).join("");
 }
+function cardHtml(p){
+  const n=state.bundle[p.id]||0;
+  const thumb=p.image
+    ? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" loading="lazy" onerror="this.outerHTML='${boxSVG.replace(/'/g,'&#39;')}'"/>`
+    : boxSVG;
+  const modelLine=p.model?`<div class="pmodel">Model <b>${escapeHtml(p.model)}</b></div>`:"";
+  const ctrl=n>0
+    ? `<div class="stepper"><button onclick="dec('${p.id}')">−</button><span class="q">${n}</span><button onclick="add('${p.id}')">+</button></div>`
+    : `<button class="mini" onclick="add('${p.id}')">+ Add</button>`;
+  const pid=p.id.replace(/'/g,"\\'");
+  return `<article class="card">
+    <div class="thumb" role="button" tabindex="0" style="cursor:pointer" onclick="goToProduct(event,'${pid}')" onkeydown="if(event.key==='Enter')goToProduct(event,'${pid}')">${thumb}<span class="cat-tag">${escapeHtml(p.cat)}</span>
+      <div class="addover"><button class="btn btn-dark" onclick="event.stopPropagation();add('${p.id}')">Add to bundle</button></div>
+    </div>
+    <div class="pbody">
+      <a class="pname" href="?p=${encodeURIComponent(p.id)}" onclick="return goToProduct(event,'${pid}')">${escapeHtml(p.name)}</a>
+      <div class="pmeta">${escapeHtml(p.brand)}</div>
+      ${modelLine}
+      <div class="prow">
+        <span class="price">${naira(p.price)}</span>
+        <span class="qbtns">${ctrl}
+          <a class="wabtn" target="_blank" rel="noreferrer" href="${oneMsg(p)}" title="Buy on WhatsApp">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2Zm5.6 14.2c-.2.6-1.2 1.2-1.7 1.2-.4 0-1 .1-3.2-.9-2.7-1.2-4.4-4-4.5-4.2-.1-.2-1-1.4-1-2.6 0-1.2.6-1.8.9-2 .2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6c-.1.2-.3.3-.1.6.1.3.7 1.1 1.4 1.7.9.8 1.6 1 1.9 1.2.2.1.4.1.5-.1l.7-.8c.2-.2.3-.2.6-.1l1.9.9c.2.1.4.2.5.3.1.3.1.7-.1 1.1Z"/></svg>
+          </a>
+        </span>
+      </div>
+    </div>
+  </article>`;
+}
 function render(){
   const q=state.q.trim().toLowerCase();
   const shown=PRODUCTS.filter(p=>{
@@ -471,37 +616,7 @@ function render(){
   });
   document.getElementById("shopTitle").textContent = state.cat==="All"?"All products":state.cat;
   document.getElementById("shopCount").textContent = shown.length+" item"+(shown.length!==1?"s":"");
-
-  document.getElementById("grid").innerHTML = shown.map(p=>{
-    const n=state.bundle[p.id]||0;
-    const gallery=(p.images&&p.images.length)?p.images:(p.image?[p.image]:[]);
-    const thumb=p.image
-      ? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" loading="lazy" onerror="this.outerHTML='${boxSVG.replace(/'/g,'&#39;')}'"/>`
-      : boxSVG;
-    const modelLine=p.model?`<div class="pmodel">Model <b>${escapeHtml(p.model)}</b></div>`:"";
-    const ctrl=n>0
-      ? `<div class="stepper"><button onclick="dec('${p.id}')">−</button><span class="q">${n}</span><button onclick="add('${p.id}')">+</button></div>`
-      : `<button class="mini" onclick="add('${p.id}')">+ Add</button>`;
-    const thumbAttrs=gallery.length?` role="button" tabindex="0" style="cursor:zoom-in" onclick="openGallery('${p.id}')" onkeydown="if(event.key==='Enter')openGallery('${p.id}')"`:"";
-    return `<article class="card">
-      <div class="thumb"${thumbAttrs}>${thumb}<span class="cat-tag">${escapeHtml(p.cat)}</span>
-        <div class="addover"><button class="btn btn-dark" onclick="event.stopPropagation();add('${p.id}')">Add to bundle</button></div>
-      </div>
-      <div class="pbody">
-        <div class="pname">${escapeHtml(p.name)}</div>
-        <div class="pmeta">${escapeHtml(p.brand)}</div>
-        ${modelLine}
-        <div class="prow">
-          <span class="price">${naira(p.price)}</span>
-          <span class="qbtns">${ctrl}
-            <a class="wabtn" target="_blank" rel="noreferrer" href="${oneMsg(p)}" title="Buy on WhatsApp">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2Zm5.6 14.2c-.2.6-1.2 1.2-1.7 1.2-.4 0-1 .1-3.2-.9-2.7-1.2-4.4-4-4.5-4.2-.1-.2-1-1.4-1-2.6 0-1.2.6-1.8.9-2 .2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6c-.1.2-.3.3-.1.6.1.3.7 1.1 1.4 1.7.9.8 1.6 1 1.9 1.2.2.1.4.1.5-.1l.7-.8c.2-.2.3-.2.6-.1l1.9.9c.2.1.4.2.5.3.1.3.1.7-.1 1.1Z"/></svg>
-            </a>
-          </span>
-        </div>
-      </div>
-    </article>`;
-  }).join("");
+  document.getElementById("grid").innerHTML = shown.map(cardHtml).join("");
   document.getElementById("empty").classList.toggle("hidden", shown.length>0);
   renderCats(); renderChips(); renderBundle();
 }
@@ -569,14 +684,17 @@ function renderGallery(){
   document.getElementById("galleryPrev").style.display=nav?"flex":"none";
   document.getElementById("galleryNext").style.display=nav?"flex":"none";
 }
+function openGalleryImages(images,startIndex){
+  if(!images||!images.length)return;
+  gState.images=images;
+  gState.i=startIndex||0;
+  renderGallery();
+  document.getElementById("galleryOverlay").classList.remove("hidden");
+}
 function openGallery(id){
   const p=PRODUCTS.find(x=>x.id===id);
   if(!p)return;
-  gState.images=(p.images&&p.images.length)?p.images:(p.image?[p.image]:[]);
-  if(!gState.images.length)return;
-  gState.i=0;
-  renderGallery();
-  document.getElementById("galleryOverlay").classList.remove("hidden");
+  openGalleryImages((p.images&&p.images.length)?p.images:(p.image?[p.image]:[]), 0);
 }
 function closeGallery(){document.getElementById("galleryOverlay").classList.add("hidden");}
 function galleryStep(d){
@@ -585,6 +703,7 @@ function galleryStep(d){
   renderGallery();
 }
 window.openGallery=openGallery;
+window.openGalleryImages=openGalleryImages;
 document.getElementById("galleryClose").onclick=closeGallery;
 document.getElementById("galleryPrev").onclick=()=>galleryStep(-1);
 document.getElementById("galleryNext").onclick=()=>galleryStep(1);
@@ -610,13 +729,137 @@ document.getElementById("heroWa").href=helloLink;
 document.getElementById("bandWa").href=helloLink;
 document.getElementById("footWa").href=helloLink;
 
+/* ============================================================
+   Product pages, persona collections, brand wall — routed by
+   URL query param (?p=ID or ?persona=slug) so pages are shareable
+   on static hosting with no server routing.
+   ============================================================ */
+const PERSONAS=[
+  {slug:"first-nest",name:"First Nest",blurb:"Starting out together"},
+  {slug:"bachelor-pad",name:"Bachelor Pad",blurb:"Solo living, sorted"},
+  {slug:"her-space",name:"Her Space",blurb:"Comfort, her way"},
+  {slug:"new-home",name:"New Home",blurb:"Moving in, fully set"},
+  {slug:"shortlet-host",name:"Shortlet Host",blurb:"Guest-ready, always"}
+];
+
+function qp(k){return new URLSearchParams(location.search).get(k);}
+function showView(view){
+  document.getElementById("catalogueView").classList.toggle("hidden",view!=="catalogue");
+  document.getElementById("detailView").classList.toggle("hidden",view!=="detail");
+  document.getElementById("personaView").classList.toggle("hidden",view!=="persona");
+}
+function goTo(url){history.pushState({},"",url);route();}
+function backToShop(e){if(e)e.preventDefault();goTo(location.pathname);return false;}
+function goToProduct(e,id){if(e)e.preventDefault();goTo("?p="+encodeURIComponent(id));return false;}
+function goToPersona(e,slug){if(e)e.preventDefault();goTo("?persona="+encodeURIComponent(slug));return false;}
+window.backToShop=backToShop;window.goToProduct=goToProduct;window.goToPersona=goToPersona;
+
+function route(){
+  const pid=qp("p"), persona=qp("persona");
+  if(pid){renderDetail(pid);showView("detail");}
+  else if(persona){renderPersonaView(persona);showView("persona");}
+  else{showView("catalogue");render();}
+  window.scrollTo(0,0);
+}
+window.addEventListener("popstate",route);
+
+function renderPersonaTiles(){
+  document.getElementById("personaGrid").innerHTML=PERSONAS.map(ps=>`
+    <a class="cat persona-tile" href="?persona=${ps.slug}" onclick="return goToPersona(event,'${ps.slug}')">
+      <div><div class="cn">${escapeHtml(ps.name)}</div><div class="cc">${escapeHtml(ps.blurb)}</div></div>
+      <span class="go">Shop →</span>
+    </a>`).join("");
+}
+
+function personaBundleMsg(items,meta){
+  const lines=items.map(p=>`${p.name}${p.model?" ("+p.model+")":""} - ${naira(p.price)}`);
+  const grandTotal=items.reduce((s,p)=>s+p.price,0);
+  return waLink(`Hello MR AVAILABLE, I'm interested in the ${meta?meta.name:"collection"} set:\n${lines.join("\n")}\n\nTotal: ${naira(grandTotal)}`);
+}
+function renderPersonaView(slug){
+  const meta=PERSONAS.find(ps=>ps.slug===slug);
+  const list=PRODUCTS.filter(p=>p.personas&&p.personas.includes(slug));
+  document.getElementById("personaTitle").textContent=meta?meta.name:slug;
+  document.getElementById("personaDesc").textContent=meta?meta.blurb:"";
+  document.getElementById("personaGridItems").innerHTML=list.map(cardHtml).join("");
+  document.getElementById("personaEmpty").classList.toggle("hidden",list.length>0);
+  const sendBtn=document.getElementById("personaSendBtn");
+  sendBtn.classList.toggle("hidden",list.length===0);
+  if(list.length) sendBtn.href=personaBundleMsg(list,meta);
+}
+
+function renderBrandWall(){
+  const brands=Array.from(new Set(PRODUCTS.map(p=>p.brand).filter(Boolean))).sort();
+  document.getElementById("brandWall").innerHTML=brands.map(b=>`<span class="brandchip">${escapeHtml(b)}</span>`).join("");
+}
+
+function detailMsg(p){
+  const url=location.origin+location.pathname+"?p="+encodeURIComponent(p.id);
+  return waLink(`Hello MR AVAILABLE, I want to buy:\n${p.name}${p.model?" (Model "+p.model+")":""}\nPrice: ${naira(p.price)}\n${url}`);
+}
+function setHero(i){
+  const g=window.__pdGallery||[];
+  if(!g[i])return;
+  document.getElementById("pdHeroImg").src=g[i];
+  document.querySelectorAll(".pd-thumb").forEach((el,idx)=>el.classList.toggle("on",idx===i));
+}
+window.setHero=setHero;
+function copyLink(id){
+  const url=location.origin+location.pathname+"?p="+encodeURIComponent(id);
+  const label=document.getElementById("pdCopyLabel");
+  const done=()=>{const old=label.textContent;label.textContent="Copied!";setTimeout(()=>label.textContent=old,1500);};
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done).catch(done);
+  else done();
+}
+function renderDetail(id){
+  const p=PRODUCTS.find(x=>x.id===id);
+  if(!p){
+    document.getElementById("pdName").textContent="Product not found";
+    document.getElementById("pdBrandModel").textContent="";
+    document.getElementById("pdPrice").textContent="";
+    document.getElementById("pdCat").textContent="";
+    document.getElementById("pdDesc").classList.add("hidden");
+    document.getElementById("pdThumbs").innerHTML="";
+    document.getElementById("pdHeroWrap").innerHTML=boxSVG;
+    document.getElementById("pdActions").classList.add("hidden");
+    return;
+  }
+  document.getElementById("pdActions").classList.remove("hidden");
+  const gallery=(p.images&&p.images.length)?p.images:(p.image?[p.image]:[]);
+  window.__pdGallery=gallery;
+  document.getElementById("pdCat").textContent=p.cat;
+  document.getElementById("pdName").textContent=p.name;
+  document.getElementById("pdBrandModel").textContent=p.brand+(p.model?(" · Model "+p.model):"");
+  document.getElementById("pdPrice").textContent=naira(p.price);
+  const descEl=document.getElementById("pdDesc");
+  descEl.textContent=p.description||"";
+  descEl.classList.toggle("hidden",!p.description);
+  const heroWrap=document.getElementById("pdHeroWrap");
+  if(gallery.length){
+    heroWrap.innerHTML=`<img id="pdHeroImg" src="${escapeHtml(gallery[0])}" alt="${escapeHtml(p.name)}" onerror="this.outerHTML='${boxSVG.replace(/'/g,'&#39;')}'"/>`;
+    heroWrap.onclick=()=>openGalleryImages(gallery,0);
+  }else{
+    heroWrap.innerHTML=boxSVG;
+    heroWrap.onclick=null;
+  }
+  document.getElementById("pdThumbs").innerHTML=gallery.length>1
+    ? gallery.map((url,i)=>`<button class="pd-thumb ${i===0?'on':''}" onclick="setHero(${i})"><img src="${escapeHtml(url)}" alt=""/></button>`).join("")
+    : "";
+  document.getElementById("pdWaBtn").href=detailMsg(p);
+  document.getElementById("pdAddBtn").onclick=()=>add(p.id);
+  document.getElementById("pdCopyBtn").onclick=()=>copyLink(p.id);
+  document.title=p.name+" — MR AVAILABLE";
+}
+
 (async function(){
   const {items:data,live,warn}=await loadProducts();
   PRODUCTS=data;
   CATS=["All",...Array.from(new Set(PRODUCTS.map(p=>p.cat))).sort()];
   if(warn) document.getElementById("notice").innerHTML=`<div class="notice">${escapeHtml(warn)}</div>`;
   else if(!live&&!(CONFIG.supabase&&CONFIG.supabase.url)) document.getElementById("notice").innerHTML=`<div class="notice">Preview mode: showing built-in sample data. Add your Supabase config in CONFIG to go live.</div>`;
-  render();
+  renderPersonaTiles();
+  renderBrandWall();
+  route();
 })();
 </script>
 </body>

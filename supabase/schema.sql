@@ -21,6 +21,15 @@ create table if not exists products (
 -- single-image field.
 alter table products add column if not exists images text[] not null default '{}';
 
+-- Short public spec/description line, editable in admin.html.
+alter table products add column if not exists description text not null default '';
+
+-- Which "shop by what you need" persona collections (First Nest,
+-- Bachelor Pad, Her Space, New Home, Shortlet Host, ...) a product
+-- belongs to. Loaded in bulk from the planner's mapping, not edited
+-- per-product in admin.html (yet).
+alter table products add column if not exists personas text[] not null default '{}';
+
 alter table products enable row level security;
 
 -- Public storefront: anyone may READ products that are published.
@@ -56,7 +65,7 @@ create policy "Public may update product photos"
   with check (true);
 
 revoke update on products from anon, authenticated;
-grant update (images, image_url) on products to anon, authenticated;
+grant update (images, image_url, description) on products to anon, authenticated;
 
 -- Non-negotiable: a product is a row created only from the catalogue
 -- (Table Editor or the seed script's service-role key), never from an
