@@ -14,63 +14,105 @@
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
   body{background:var(--paper);color:var(--ink);font-family:"Poppins",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
-  .wrap{max-width:760px;margin:0 auto;padding:40px 20px 80px}
+  .wrap{max-width:820px;margin:0 auto;padding:40px 20px 80px}
   h1{font-size:26px;font-weight:800;letter-spacing:-.02em;margin:0 0 6px}
+  h2{font-size:15px;font-weight:700;margin:0 0 10px}
   .lead{color:var(--muted);font-size:14px;margin:0 0 24px;max-width:560px}
   .card{background:var(--soft);border-radius:16px;padding:20px;margin-bottom:20px}
-  .card h2{font-size:15px;font-weight:700;margin:0 0 10px}
   .card p{font-size:13px;color:var(--muted);margin:0 0 10px}
   code{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:12.5px}
-  .drop{border:2px dashed var(--line);border-radius:16px;padding:36px 20px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
+  input[type=email],input[type=password],input[type=text]{width:100%;padding:10px 13px;border:1px solid var(--line);border-radius:10px;font-size:13.5px;font-family:inherit;background:#fff}
+  label{display:block;font-size:12.5px;font-weight:600;margin-bottom:5px;margin-top:12px}
+  label:first-child{margin-top:0}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:13.5px;border-radius:999px;padding:11px 20px;background:var(--ink);color:#fff;cursor:pointer;border:none;font-family:inherit;margin-top:14px}
+  .btn:hover{opacity:.9}
+  .btn.ghost{background:var(--soft);color:var(--ink);border:1px solid var(--line)}
+  .err{color:var(--err);font-size:12.5px;margin-top:8px}
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+  .topbar .who{font-size:12.5px;color:var(--muted)}
+  .topbar .who b{color:var(--ink)}
+  .topbar .signout{font-size:12.5px;font-weight:600;color:var(--ink);background:none;border:none;cursor:pointer;text-decoration:underline;font-family:inherit}
+  .search{width:100%;padding:10px 14px;border:1px solid var(--line);border-radius:999px;font-size:13.5px;font-family:inherit;margin-bottom:10px;background:#fff}
+  .plist{max-height:260px;overflow-y:auto;border:1px solid var(--line);border-radius:10px;background:#fff}
+  .prow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;border-bottom:1px solid var(--line);cursor:pointer;font-size:13px}
+  .prow:last-child{border-bottom:none}
+  .prow:hover{background:var(--soft)}
+  .prow.on{background:var(--ink);color:#fff}
+  .prow .pn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .prow .pf{font-size:11px;color:var(--muted);flex:0 0 auto}
+  .prow.on .pf{color:rgba(255,255,255,.7)}
+  .badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;background:#FFF7E6;color:#8A5A00}
+  .selected{border:1px solid var(--line);border-radius:16px;padding:20px;margin-top:20px}
+  .selected .sid{font-size:12px;color:var(--muted)}
+  .selected .sname{font-size:17px;font-weight:700;margin-top:2px}
+  .drop{border:2px dashed var(--line);border-radius:16px;padding:28px 20px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;margin-top:16px}
   .drop.over{border-color:var(--accent);background:#FFF7E6}
   .drop input{display:none}
-  .drop .dt{font-weight:600;font-size:14.5px}
-  .drop .ds{font-size:12.5px;color:var(--muted);margin-top:4px}
-  table{width:100%;border-collapse:collapse;font-size:13px}
-  th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
-  th{color:var(--muted);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em}
-  .lookup{max-height:220px;overflow-y:auto;border:1px solid var(--line);border-radius:10px;background:#fff}
-  .lookup table{margin:0}
-  .search{width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:999px;font-size:13.5px;font-family:inherit;margin-bottom:10px;background:#fff}
-  .rows{margin-top:20px;display:flex;flex-direction:column;gap:10px}
-  .row{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px}
-  .row img{width:44px;height:44px;border-radius:8px;object-fit:cover;background:var(--soft);flex:0 0 auto}
-  .row .info{flex:1;min-width:0}
-  .row .fn{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .row .st{font-size:12px;color:var(--muted)}
-  .row .st.ok{color:var(--ok)}
-  .row .st.err{color:var(--err)}
+  .drop .dt{font-weight:600;font-size:14px}
+  .drop .ds{font-size:12px;color:var(--muted);margin-top:4px}
+  .thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;margin-top:16px}
+  .thumb{position:relative;border-radius:10px;overflow:hidden;aspect-ratio:1/1;background:var(--soft)}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .thumb .primary{position:absolute;top:5px;left:5px;background:var(--accent);color:var(--ink);font-size:9px;font-weight:700;padding:2px 6px;border-radius:999px}
+  .thumb .tbtns{position:absolute;bottom:5px;right:5px;display:flex;gap:3px}
+  .thumb .tbtns button{height:22px;width:22px;border-radius:999px;background:rgba(20,33,58,.85);color:#fff;border:none;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .status{font-size:12.5px;margin-top:14px}
+  .status.ok{color:var(--ok)}
+  .status.err{color:var(--err)}
+  .hidden{display:none}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>Photo uploader</h1>
-  <p class="lead">Upload product photos here. This page is not linked from the storefront and does not require a login — keep the URL to yourself.</p>
 
-  <div class="card">
-    <h2>How it works</h2>
-    <p>Name each image file after the product's ID, then drop it below. <code>TV001.jpg</code> uploads and attaches itself to product <code>TV001</code> automatically. Only that product's photo changes — nothing else about it.</p>
+  <div id="loginView" class="hidden">
+    <h1>Photo uploader</h1>
+    <p class="lead">Sign in with the owner account to manage product photos.</p>
+    <div class="card">
+      <label for="loginEmail">Email</label>
+      <input type="email" id="loginEmail" autocomplete="username" />
+      <label for="loginPassword">Password</label>
+      <input type="password" id="loginPassword" autocomplete="current-password" />
+      <button class="btn" id="loginBtn">Sign in</button>
+      <div class="err hidden" id="loginErr"></div>
+    </div>
   </div>
 
-  <div class="card">
-    <h2>Look up a product ID</h2>
-    <p>Type a name or brand to find the ID to save your file as.</p>
-    <input class="search" id="search" placeholder="Search products..." />
-    <div class="lookup"><table id="lookupTable"><tbody></tbody></table></div>
+  <div id="appView" class="hidden">
+    <div class="topbar">
+      <div>
+        <h1 style="margin-bottom:2px">Photo uploader</h1>
+        <div class="who">Signed in as <b id="whoEmail"></b></div>
+      </div>
+      <button class="signout" id="signOutBtn">Sign out</button>
+    </div>
+
+    <div class="card">
+      <h2>Pick a product</h2>
+      <p>Search by name, brand, or ID, then click one to manage its photos.</p>
+      <input class="search" id="search" placeholder="Search products..." />
+      <div class="plist" id="plist"></div>
+    </div>
+
+    <div class="selected hidden" id="selectedPanel">
+      <div class="sid" id="selId"></div>
+      <div class="sname" id="selName"></div>
+
+      <div class="thumbs" id="thumbs"></div>
+
+      <div class="drop" id="drop">
+        <input type="file" id="fileInput" accept="image/*" multiple />
+        <div class="dt">Click to add photos, or drag them here</div>
+        <div class="ds">JPG or PNG, up to 5MB each. Any filename works — drop several at once for a gallery.</div>
+      </div>
+      <div class="status hidden" id="uploadStatus"></div>
+    </div>
   </div>
 
-  <div class="drop" id="drop">
-    <input type="file" id="fileInput" accept="image/*" multiple />
-    <div class="dt">Click to choose photos, or drag them here</div>
-    <div class="ds">JPG or PNG, up to 5MB each. Multiple files at once is fine.</div>
-  </div>
-
-  <div class="rows" id="rows"></div>
 </div>
 
 <script>
 const CONFIG = {
-  // Same Supabase project as index.html.
   supabase: {
     url: "https://eqwkbosrgaxsgqluakuo.supabase.co",
     anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxd2tib3NyZ2F4c2dxbHVha3VvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4MzE1MDAsImV4cCI6MjEwMzQwNzUwMH0.li8Qxm_t1o3dG0xxQNV9_kwL0Cyfo88qfZ0OKZEAlHE"
@@ -80,70 +122,158 @@ const CONFIG = {
 const client = supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
 
 function escapeHtml(s){return String(s||"").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function naira(n){return "₦" + Number(n||0).toLocaleString("en-NG");}
 
-let PRODUCTS = [];
-async function loadLookup(){
-  const { data, error } = await client.from("products").select("id,name,brand").eq("published", true).order("id");
-  if(error) throw error;
-  PRODUCTS = data||[];
-  renderLookup("");
+let PRODUCTS=[], currentId=null, currentImages=[];
+
+function showLogin(){
+  document.getElementById("loginView").classList.remove("hidden");
+  document.getElementById("appView").classList.add("hidden");
 }
-function renderLookup(q){
+async function showApp(session){
+  document.getElementById("loginView").classList.add("hidden");
+  document.getElementById("appView").classList.remove("hidden");
+  document.getElementById("whoEmail").textContent = session.user.email || "";
+  await loadProducts();
+}
+
+async function loadProducts(){
+  const { data, error } = await client.from("products").select("id,name,brand,category,published,selling_price").order("id");
+  if(error){ document.getElementById("plist").innerHTML = `<div class="prow" style="color:var(--err)">Could not load products.</div>`; return; }
+  PRODUCTS = data||[];
+  renderList("");
+}
+function renderList(q){
   const query = q.trim().toLowerCase();
   const shown = PRODUCTS.filter(p=>!query || (p.id+" "+p.name+" "+p.brand).toLowerCase().includes(query));
-  document.querySelector("#lookupTable tbody").innerHTML = shown.map(p=>
-    `<tr><td><code>${escapeHtml(p.id)}</code></td><td>${escapeHtml(p.brand)} ${escapeHtml(p.name)}</td></tr>`
-  ).join("") || `<tr><td colspan="2" style="color:var(--muted)">No match.</td></tr>`;
+  document.getElementById("plist").innerHTML = shown.map(p=>`
+    <div class="prow ${p.id===currentId?'on':''}" onclick="selectProduct('${p.id.replace(/'/g,"\\'")}')">
+      <span class="pn"><code>${escapeHtml(p.id)}</code> — ${escapeHtml(p.brand)} ${escapeHtml(p.name)}</span>
+      <span class="pf">${p.published?naira(p.selling_price):'<span class="badge">unpublished</span>'}</span>
+    </div>`).join("") || `<div class="prow">No match.</div>`;
 }
-document.getElementById("search").addEventListener("input", e=>renderLookup(e.target.value));
-loadLookup().catch(()=>{ document.querySelector("#lookupTable tbody").innerHTML = `<tr><td colspan="2" style="color:var(--err)">Could not load products.</td></tr>`; });
+document.getElementById("search").addEventListener("input", e=>renderList(e.target.value));
 
-const rowsEl = document.getElementById("rows");
-function addRow(file){
-  const id = file.name.replace(/\.[^.]+$/, "").trim();
-  const row = document.createElement("div");
-  row.className = "row";
-  const previewUrl = URL.createObjectURL(file);
-  row.innerHTML = `<img src="${previewUrl}" /><div class="info"><div class="fn">${escapeHtml(file.name)} → <code>${escapeHtml(id)}</code></div><div class="st">Uploading...</div></div>`;
-  rowsEl.prepend(row);
-  const statusEl = row.querySelector(".st");
-  uploadOne(id, file, statusEl);
+async function selectProduct(id){
+  currentId = id;
+  const p = PRODUCTS.find(x=>x.id===id);
+  document.getElementById("selectedPanel").classList.remove("hidden");
+  document.getElementById("selId").innerHTML = `<code>${escapeHtml(id)}</code>`;
+  document.getElementById("selName").textContent = p ? `${p.brand} ${p.name}` : id;
+  setStatus("", "");
+  renderList(document.getElementById("search").value);
+  await refreshImages(id, {persist:false});
 }
-async function uploadOne(id, file, statusEl){
-  try{
-    const ext = (file.name.match(/\.([^.]+)$/) || [,"jpg"])[1].toLowerCase();
-    const path = `${id}.${ext}`;
-    const { error: upErr } = await client.storage.from("products").upload(path, file, { upsert: true, contentType: file.type || "image/jpeg" });
-    if(upErr) throw upErr;
-    const { data: pub } = client.storage.from("products").getPublicUrl(path);
-    const url = pub.publicUrl + "?t=" + Date.now();
-    const { data, error: updErr } = await client.from("products").update({ image_url: url }).eq("id", id).select("id");
-    if(updErr) throw updErr;
-    if(!data || !data.length){
-      statusEl.textContent = `No product with ID "${id}" exists.`;
-      statusEl.className = "st err";
-      return;
-    }
-    statusEl.textContent = "Done — attached to " + id;
-    statusEl.className = "st ok";
-  }catch(e){
-    statusEl.textContent = "Upload failed: " + (e.message || e);
-    statusEl.className = "st err";
+window.selectProduct = selectProduct;
+
+function publicUrlFor(path){
+  return client.storage.from("products").getPublicUrl(path).data.publicUrl;
+}
+
+async function refreshImages(id, opts){
+  const { data, error } = await client.storage.from("products").list(id, { limit: 200, sortBy: { column: "name", order: "asc" } });
+  if(error){ currentImages = []; renderThumbs(); return; }
+  const files = (data||[]).filter(f=>f.name && !f.name.startsWith("."));
+  currentImages = files.map(f=>publicUrlFor(`${id}/${f.name}`));
+  renderThumbs();
+  if(!opts || opts.persist!==false) await saveImages(id, currentImages);
+}
+
+async function saveImages(id, urls){
+  const { data, error } = await client.from("products").update({ images: urls, image_url: urls[0]||"" }).eq("id", id).select("id");
+  if(error){ setStatus("Could not save: " + error.message, "err"); return false; }
+  if(!data || !data.length){ setStatus("Sign-in doesn't have permission to update this product.", "err"); return false; }
+  return true;
+}
+
+function renderThumbs(){
+  document.getElementById("thumbs").innerHTML = currentImages.map((url,i)=>`
+    <div class="thumb">
+      <img src="${escapeHtml(url)}" loading="lazy" />
+      ${i===0?'<span class="primary">Primary</span>':''}
+      <div class="tbtns">
+        ${i>0?`<button title="Move earlier" onclick="moveImage(${i},-1)">‹</button>`:''}
+        ${i<currentImages.length-1?`<button title="Move later" onclick="moveImage(${i},1)">›</button>`:''}
+        <button title="Delete" onclick="deleteImage(${i})">✕</button>
+      </div>
+    </div>`).join("");
+}
+
+async function moveImage(i, dir){
+  const j = i+dir;
+  if(j<0 || j>=currentImages.length) return;
+  [currentImages[i], currentImages[j]] = [currentImages[j], currentImages[i]];
+  renderThumbs();
+  await saveImages(currentId, currentImages);
+}
+window.moveImage = moveImage;
+
+function pathFromPublicUrl(url){
+  const marker = "/storage/v1/object/public/products/";
+  const idx = url.indexOf(marker);
+  return idx===-1 ? null : url.slice(idx+marker.length);
+}
+
+async function deleteImage(i){
+  const url = currentImages[i];
+  const path = pathFromPublicUrl(url);
+  if(path){
+    const { error } = await client.storage.from("products").remove([path]);
+    if(error){ setStatus("Could not delete file: " + error.message, "err"); return; }
   }
+  currentImages.splice(i,1);
+  renderThumbs();
+  await saveImages(currentId, currentImages);
+}
+window.deleteImage = deleteImage;
+
+function setStatus(msg, kind){
+  const el = document.getElementById("uploadStatus");
+  el.textContent = msg;
+  el.className = "status" + (kind?(" "+kind):"") + (msg?"":" hidden");
+  if(!msg) el.classList.add("hidden");
+}
+
+async function uploadFiles(files){
+  if(!currentId) return;
+  setStatus(`Uploading ${files.length} photo${files.length!==1?'s':''}...`, "");
+  for(const file of files){
+    const ext = (file.name.match(/\.([^.]+)$/) || [,"jpg"])[1].toLowerCase();
+    const name = `${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`;
+    const { error } = await client.storage.from("products").upload(`${currentId}/${name}`, file, { contentType: file.type || "image/jpeg" });
+    if(error){ setStatus("Upload failed: " + error.message, "err"); return; }
+  }
+  await refreshImages(currentId);
+  setStatus(`Done — ${files.length} photo${files.length!==1?'s':''} added.`, "ok");
 }
 
 const drop = document.getElementById("drop");
 const fileInput = document.getElementById("fileInput");
 drop.addEventListener("click", ()=>fileInput.click());
-fileInput.addEventListener("change", ()=>{
-  Array.from(fileInput.files).forEach(addRow);
-  fileInput.value = "";
-});
+fileInput.addEventListener("change", ()=>{ uploadFiles(Array.from(fileInput.files)); fileInput.value=""; });
 ["dragenter","dragover"].forEach(evt=>drop.addEventListener(evt, e=>{ e.preventDefault(); drop.classList.add("over"); }));
 ["dragleave","drop"].forEach(evt=>drop.addEventListener(evt, e=>{ e.preventDefault(); drop.classList.remove("over"); }));
-drop.addEventListener("drop", e=>{
-  Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith("image/")).forEach(addRow);
+drop.addEventListener("drop", e=>{ uploadFiles(Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith("image/"))); });
+
+document.getElementById("loginBtn").addEventListener("click", async ()=>{
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
+  const errEl = document.getElementById("loginErr");
+  errEl.classList.add("hidden");
+  const { data, error } = await client.auth.signInWithPassword({ email, password });
+  if(error){ errEl.textContent = error.message; errEl.classList.remove("hidden"); return; }
+  await showApp(data.session);
 });
+document.getElementById("signOutBtn").addEventListener("click", async ()=>{
+  await client.auth.signOut();
+  showLogin();
+});
+
+(async function(){
+  const { data } = await client.auth.getSession();
+  if(data.session) await showApp(data.session);
+  else showLogin();
+})();
 </script>
 </body>
 </html>
