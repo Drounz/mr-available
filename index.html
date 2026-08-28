@@ -171,6 +171,19 @@
   .send{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--wa);color:#fff;font-weight:700;border-radius:999px;padding:15px;font-size:15px}
   .fine{text-align:center;font-size:11.5px;color:var(--muted);margin-top:8px}
   .hidden{display:none}
+
+  /* photo gallery viewer */
+  .gwrap{width:100%;max-width:560px;background:#fff;border-radius:24px;padding:16px;position:relative}
+  .gclose{position:absolute;top:10px;right:10px;z-index:2}
+  .gstage{position:relative;background:var(--soft);border-radius:16px;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .gstage img{width:100%;height:100%;object-fit:contain;background:var(--soft)}
+  .gnav{position:absolute;top:50%;transform:translateY(-50%);height:38px;width:38px;border-radius:999px;background:rgba(255,255,255,.9);box-shadow:0 4px 14px rgba(20,33,58,.18);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--ink)}
+  .gnav:hover{background:#fff}
+  .gprev{left:10px}
+  .gnext{right:10px}
+  .gdots{display:flex;justify-content:center;gap:6px;margin-top:12px}
+  .gdot{height:7px;width:7px;border-radius:999px;background:var(--line)}
+  .gdot.on{background:var(--accent);width:16px}
 </style>
 </head>
 <body>
@@ -312,6 +325,18 @@
   </div>
 </div>
 
+<div class="overlay hidden" id="galleryOverlay">
+  <div class="gwrap">
+    <button class="xbtn gclose" id="galleryClose">✕</button>
+    <div class="gstage">
+      <button class="gnav gprev" id="galleryPrev" aria-label="Previous photo">‹</button>
+      <img id="galleryImg" src="" alt="" />
+      <button class="gnav gnext" id="galleryNext" aria-label="Next photo">›</button>
+    </div>
+    <div class="gdots" id="galleryDots"></div>
+  </div>
+</div>
+
 <script>
 /* ============================================================
    CONFIG  —  edit these two lines, nothing else
@@ -393,15 +418,21 @@ async function loadProducts(){
       const client = supabase.createClient(sb.url, sb.anonKey);
       const { data, error } = await client.from("products").select("*").eq("published", true);
       if(error) throw error;
-      const items = (data||[]).map(r=>({
-        id: String(r.id||"").trim(),
-        name: String(r.name||"").trim(),
-        model: String(r.model||"").trim(),
-        cat: String(r.category||"Other").trim(),
-        brand: String(r.brand||"").trim(),
-        image: String(r.image_url||"").trim(),
-        price: Number(r.selling_price)||0
-      })).filter(p=>p.id && p.name && p.price>0);
+      const items = (data||[]).map(r=>{
+        const gallery = (Array.isArray(r.images) ? r.images : []).map(u=>String(u||"").trim()).filter(Boolean);
+        const fallback = String(r.image_url||"").trim();
+        const images = gallery.length ? gallery : (fallback ? [fallback] : []);
+        return {
+          id: String(r.id||"").trim(),
+          name: String(r.name||"").trim(),
+          model: String(r.model||"").trim(),
+          cat: String(r.category||"Other").trim(),
+          brand: String(r.brand||"").trim(),
+          image: images[0]||"",
+          images,
+          price: Number(r.selling_price)||0
+        };
+      }).filter(p=>p.id && p.name && p.price>0);
       items.sort((a,b)=> a.cat.localeCompare(b.cat) || a.name.localeCompare(b.name));
       if(items.length) return { items, live:true };
       return { items: FALLBACK, live:false };
@@ -441,6 +472,7 @@ function render(){
 
   document.getElementById("grid").innerHTML = shown.map(p=>{
     const n=state.bundle[p.id]||0;
+    const gallery=(p.images&&p.images.length)?p.images:(p.image?[p.image]:[]);
     const thumb=p.image
       ? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" loading="lazy" onerror="this.outerHTML='${boxSVG.replace(/'/g,'&#39;')}'"/>`
       : boxSVG;
@@ -448,9 +480,10 @@ function render(){
     const ctrl=n>0
       ? `<div class="stepper"><button onclick="dec('${p.id}')">−</button><span class="q">${n}</span><button onclick="add('${p.id}')">+</button></div>`
       : `<button class="mini" onclick="add('${p.id}')">+ Add</button>`;
+    const thumbAttrs=gallery.length?` role="button" tabindex="0" style="cursor:zoom-in" onclick="openGallery('${p.id}')" onkeydown="if(event.key==='Enter')openGallery('${p.id}')"`:"";
     return `<article class="card">
-      <div class="thumb">${thumb}<span class="cat-tag">${escapeHtml(p.cat)}</span>
-        <div class="addover"><button class="btn btn-dark" onclick="add('${p.id}')">Add to bundle</button></div>
+      <div class="thumb"${thumbAttrs}>${thumb}<span class="cat-tag">${escapeHtml(p.cat)}</span>
+        <div class="addover"><button class="btn btn-dark" onclick="event.stopPropagation();add('${p.id}')">Add to bundle</button></div>
       </div>
       <div class="pbody">
         <div class="pname">${escapeHtml(p.name)}</div>
@@ -523,6 +556,52 @@ document.getElementById("openBundle").onclick=openBundle;
 document.getElementById("openBundle2").onclick=openBundle;
 document.getElementById("closeBundle").onclick=closeBundle;
 document.getElementById("overlay").addEventListener("click",e=>{if(e.target.id==="overlay")closeBundle();});
+
+let gState={images:[],i:0};
+function renderGallery(){
+  document.getElementById("galleryImg").src=gState.images[gState.i]||"";
+  document.getElementById("galleryDots").innerHTML=gState.images.length>1
+    ? gState.images.map((_,i)=>`<span class="gdot ${i===gState.i?'on':''}" onclick="gState.i=${i};renderGallery()"></span>`).join("")
+    : "";
+  const nav=gState.images.length>1;
+  document.getElementById("galleryPrev").style.display=nav?"flex":"none";
+  document.getElementById("galleryNext").style.display=nav?"flex":"none";
+}
+function openGallery(id){
+  const p=PRODUCTS.find(x=>x.id===id);
+  if(!p)return;
+  gState.images=(p.images&&p.images.length)?p.images:(p.image?[p.image]:[]);
+  if(!gState.images.length)return;
+  gState.i=0;
+  renderGallery();
+  document.getElementById("galleryOverlay").classList.remove("hidden");
+}
+function closeGallery(){document.getElementById("galleryOverlay").classList.add("hidden");}
+function galleryStep(d){
+  if(!gState.images.length)return;
+  gState.i=(gState.i+d+gState.images.length)%gState.images.length;
+  renderGallery();
+}
+window.openGallery=openGallery;
+document.getElementById("galleryClose").onclick=closeGallery;
+document.getElementById("galleryPrev").onclick=()=>galleryStep(-1);
+document.getElementById("galleryNext").onclick=()=>galleryStep(1);
+document.getElementById("galleryOverlay").addEventListener("click",e=>{if(e.target.id==="galleryOverlay")closeGallery();});
+document.addEventListener("keydown",e=>{
+  if(document.getElementById("galleryOverlay").classList.contains("hidden"))return;
+  if(e.key==="Escape")closeGallery();
+  if(e.key==="ArrowLeft")galleryStep(-1);
+  if(e.key==="ArrowRight")galleryStep(1);
+});
+(function(){
+  let sx=0;
+  const stage=document.querySelector(".gstage");
+  stage.addEventListener("touchstart",e=>{sx=e.touches[0].clientX;},{passive:true});
+  stage.addEventListener("touchend",e=>{
+    const dx=e.changedTouches[0].clientX-sx;
+    if(Math.abs(dx)>40)galleryStep(dx<0?1:-1);
+  },{passive:true});
+})();
 
 const helloLink=waLink("Hello MR AVAILABLE, I have a question about your products.");
 document.getElementById("heroWa").href=helloLink;

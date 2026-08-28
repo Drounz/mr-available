@@ -498,5 +498,515 @@
     "selling_price": 560000,
     "image_url": "",
     "published": true
+  },
+  {
+    "id": "AC-001",
+    "name": "LG split, non-inverter",
+    "model": "1.5HP Standard",
+    "category": "Air Conditioner",
+    "brand": "LG",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "AC-002",
+    "name": "LG split inverter",
+    "model": "Dualcool 1.5HP",
+    "category": "Air Conditioner",
+    "brand": "LG",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "AC-003",
+    "name": "Hisense split inverter",
+    "model": "1.5HP Inverter",
+    "category": "Air Conditioner",
+    "brand": "Hisense",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "AC-004",
+    "name": "LG inverter, gen-friendly",
+    "model": "GenCool 1.5HP",
+    "category": "Air Conditioner",
+    "brand": "LG",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "AC-005",
+    "name": "LG floor standing inverter",
+    "model": "Standing 3HP",
+    "category": "Air Conditioner",
+    "brand": "LG",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "AF-001",
+    "name": "Silver Crest 6L, 2400W",
+    "model": "6L Air Fryer",
+    "category": "Air Fryer",
+    "brand": "Silver Crest",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "AF-002",
+    "name": "Binatone digital air fryer",
+    "model": "",
+    "category": "Air Fryer",
+    "brand": "Binatone",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "AF-003",
+    "name": "Scanfrost 3.2L digital air fryer",
+    "model": "3.2L Digital",
+    "category": "Air Fryer",
+    "brand": "Scanfrost",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "BL-001",
+    "name": "Binatone 1.5L, 350W, 2-speed + grinder",
+    "model": "BLG-420",
+    "category": "Blender",
+    "brand": "Binatone",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "BL-002",
+    "name": "Binatone blender and smoothie maker",
+    "model": "BLS-452",
+    "category": "Blender",
+    "brand": "Binatone",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "BL-003",
+    "name": "Binatone 1500W commercial blender",
+    "model": "Professional 1500W",
+    "category": "Blender",
+    "brand": "Binatone",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "CK-001",
+    "name": "Maxi 4-burner all-gas, oven + grill, 50x50",
+    "model": "CK-5402",
+    "category": "Cookers",
+    "brand": "Maxi",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "CK-002",
+    "name": "Maxi 3 gas + 1 hotplate, oven + grill, 60x60",
+    "model": "CK-6312 NG",
+    "category": "Cookers",
+    "brand": "Maxi",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "CK-003",
+    "name": "Skyrun 5 gas + wok, oven/grill, 90x55, inox",
+    "model": "SFC9500SS",
+    "category": "Cookers",
+    "brand": "Skyrun",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "FN-001",
+    "name": "Ox standing, 3-speed, oscillating",
+    "model": "18\" Industrial",
+    "category": "Fans",
+    "brand": "Ox",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "FN-002",
+    "name": "Century rechargeable, remote, ~6hr",
+    "model": "18\" Rechargeable",
+    "category": "Fans",
+    "brand": "Century",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "FZ-001",
+    "name": "Hisense 141L chest freezer, R600",
+    "model": "FC-190SH",
+    "category": "Freezer",
+    "brand": "Hisense",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "FZ-002",
+    "name": "Scanfrost 100L chest freezer",
+    "model": "SFL111",
+    "category": "Freezer",
+    "brand": "Scanfrost",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "FZ-003",
+    "name": "Scanfrost 200L chest freezer, lock and key",
+    "model": "SFL200ECO",
+    "category": "Freezer",
+    "brand": "Scanfrost",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "FZ-004",
+    "name": "Scanfrost 300L chest freezer",
+    "model": "SFL300",
+    "category": "Freezer",
+    "brand": "Scanfrost",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "GN-001",
+    "name": "Firman 1kVA manual, petrol",
+    "model": "SPG1800",
+    "category": "Generator",
+    "brand": "Firman",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "GN-002",
+    "name": "Firman 1.2kVA manual",
+    "model": "ECO1990S",
+    "category": "Generator",
+    "brand": "Firman",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "GN-003",
+    "name": "Firman 2.5kVA manual, petrol",
+    "model": "2.5KVA Manual",
+    "category": "Generator",
+    "brand": "Firman",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "GN-004",
+    "name": "Firman 3kVA key start",
+    "model": "Eco3990es",
+    "category": "Generator",
+    "brand": "Firman",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "GN-005",
+    "name": "Firman 3.5kVA electric start, dual outlet",
+    "model": "FPG4800E2",
+    "category": "Generator",
+    "brand": "Firman",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "GN-006",
+    "name": "Firman 6kVA key start",
+    "model": "ECO8990ES",
+    "category": "Generator",
+    "brand": "Firman",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "HT-001",
+    "name": "LG 2.0ch, 40W soundbar, Bluetooth",
+    "model": "Xboom 40W",
+    "category": "Home Theatre",
+    "brand": "LG",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "HT-002",
+    "name": "LG 2.1ch, 300W soundbar, wireless sub",
+    "model": "Bodyguard 1500W",
+    "category": "Home Theatre",
+    "brand": "LG",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "HT-003",
+    "name": "LG 4.1ch high-power soundbar",
+    "model": "SNH5",
+    "category": "Home Theatre",
+    "brand": "LG",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "IR-001",
+    "name": "Philips dry iron, 1200W, DynaGlide",
+    "model": "GC160",
+    "category": "Iron",
+    "brand": "Philips",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "IR-002",
+    "name": "Binatone dry iron, non-stick soleplate",
+    "model": "DI-1255 MK2",
+    "category": "Iron",
+    "brand": "Binatone",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "KT-001",
+    "name": "Binatone 1.7L electric kettle",
+    "model": "Si-2225",
+    "category": "Kettle",
+    "brand": "Binatone",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "KT-002",
+    "name": "Century auto switch off",
+    "model": "4.3L Kettle",
+    "category": "Kettle",
+    "brand": "Century",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "MW-002",
+    "name": "Hisense 20L manual, 700W, black",
+    "model": "H20MOBS10",
+    "category": "Microwaves",
+    "brand": "Hisense",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "RF-001",
+    "name": "Hisense 124L single door, R600",
+    "model": "REF172DR",
+    "category": "Refrigerator",
+    "brand": "Hisense",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "RF-002",
+    "name": "Thermocool 160L double door, direct cool",
+    "model": "HRF-160BEX",
+    "category": "Refrigerator",
+    "brand": "Thermocool",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "RF-003",
+    "name": "Thermocool 250L double door",
+    "model": "HRF-250 BLUX",
+    "category": "Refrigerator",
+    "brand": "Thermocool",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "RF-004",
+    "name": "Thermocool 540L side-by-side, twin inverter",
+    "model": "HRF-540WBS",
+    "category": "Refrigerator",
+    "brand": "Thermocool",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "TV-001",
+    "name": "TCL 32\" HD Android Smart TV",
+    "model": "32S5400",
+    "category": "Television",
+    "brand": "TCL",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "TV-002",
+    "name": "Hisense 43\" FHD Smart TV, VIDAA",
+    "model": "43A4K",
+    "category": "Television",
+    "brand": "Hisense",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "TV-003",
+    "name": "Hisense 50\" 4K UHD Smart TV, VIDAA",
+    "model": "50A6K",
+    "category": "Television",
+    "brand": "Hisense",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "TV-004",
+    "name": "Hisense 55\" 4K UHD Bluetooth Smart TV",
+    "model": "55A6N",
+    "category": "Television",
+    "brand": "Hisense",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "TV-005",
+    "name": "Samsung 43\" Crystal UHD 4K HDR10",
+    "model": "UA43DU7000",
+    "category": "Television",
+    "brand": "Samsung",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "TV-006",
+    "name": "LG 43\" 4K UHD Smart TV, webOS",
+    "model": "UR7500",
+    "category": "Television",
+    "brand": "LG",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "WM-001",
+    "name": "Thermocool 6 to 7kg semi-auto twin tub",
+    "model": "Hygiene Master",
+    "category": "Washing Machine",
+    "brand": "Thermocool",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "WM-002",
+    "name": "Hisense 8kg top load automatic",
+    "model": "WM 802T",
+    "category": "Washing Machine",
+    "brand": "Hisense",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "WM-003",
+    "name": "LG 8kg top load, smart inverter",
+    "model": "WM-8585",
+    "category": "Washing Machine",
+    "brand": "LG",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "WM-004",
+    "name": "LG 7kg front load automatic",
+    "model": "WM2Y1HYP6J",
+    "category": "Washing Machine",
+    "brand": "LG",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "WD-001",
+    "name": "Cway 3 faucets, hot/cold/neutral",
+    "model": "WD1663S",
+    "category": "Water Dispenser",
+    "brand": "Cway",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "WD-002",
+    "name": "Cway top load, hot/cold",
+    "model": "SFWD 1402",
+    "category": "Water Dispenser",
+    "brand": "Cway",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
+  },
+  {
+    "id": "WD-003",
+    "name": "Panasonic bottom load, hot/cold",
+    "model": "SDM-WD3438BG",
+    "category": "Water Dispenser",
+    "brand": "Panasonic",
+    "selling_price": 0,
+    "image_url": "",
+    "published": false
   }
 ]

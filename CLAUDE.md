@@ -11,7 +11,7 @@ A storefront for MR AVAILABLE, a home appliances and electronics store in Nigeri
 - The site does NOT depend on Firebase or Google Sheets. Older Firebase code is deprecated, do not reintroduce it (Firebase Storage forces the paid Blaze plan just to enable it at all — Supabase's free tier does not).
 
 ## How data flows
-On load, `loadProducts()` creates a Supabase client from `CONFIG.supabase`, then reads the `products` table where `published = true` and maps rows to `{id,name,model,cat,brand,image,price}`. If Supabase is unreachable or config is blank, it falls back to the built-in `FALLBACK` array so the page still renders. Keep this fallback behavior.
+On load, `loadProducts()` creates a Supabase client from `CONFIG.supabase`, then reads the `products` table where `published = true` and maps rows to `{id,name,model,cat,brand,image,images,price}`. `images` is the ordered gallery array; `image` is `images[0]` (or `image_url` for any row not yet migrated to the array). If Supabase is unreachable or config is blank, it falls back to the built-in `FALLBACK` array so the page still renders. Keep this fallback behavior.
 
 ## Config (top of the `<script>` block)
 ```js
@@ -24,12 +24,12 @@ Supabase URL and anon key are safe to expose; access is controlled by Row Level 
 
 ## Database (Supabase Postgres)
 Table `products`, one row per product (`id` = product code, primary key). Public columns only:
-`name`, `model`, `category`, `brand`, `selling_price` (numeric), `image_url`, `published` (boolean).
+`name`, `model`, `category`, `brand`, `selling_price` (numeric), `image_url`, `images` (text array), `published` (boolean).
 Cost price is NOT stored here — keep cost and margin records in a separate, non-public sheet.
-Policies (`supabase/schema.sql`): public may SELECT published products, and may UPDATE only the `image_url` column of an existing row (via `admin.html`'s photo uploader — no login by deliberate choice, so this is enforced at the database layer: no other column, no insert, no delete, is possible from the browser). Bulk edits happen in the Supabase dashboard's Table Editor or via `supabase/seed/seed.js` (service-role key, bypasses RLS). Seed with `supabase/seed/products.json`.
+Policies (`supabase/schema.sql`): public may SELECT published products; the signed-in owner (Supabase Auth) may additionally SELECT every product (including unpublished) and UPDATE only the `images`/`image_url` columns of an existing row — no other column, no insert, no delete, is possible from the browser, signed in or not. Bulk edits happen in the Supabase dashboard's Table Editor or via `supabase/seed/seed.js` (service-role key, bypasses RLS). Seed with `supabase/seed/products.json`.
 
 ## Photo uploads (`admin.html`)
-A second static file, not linked from the storefront, for the owner to drop in product photos. Naming convention: the image filename (without extension) must equal the product's ID, e.g. `TV001.jpg`. It uploads to the `products` Storage bucket and writes the resulting public URL into that product's `image_url` — no manual Firestore/Postgres editing needed. No login; the write surface is instead locked down by `supabase/schema.sql`'s policies and the bucket's file-size/MIME-type limits. Keep the admin.html URL private.
+A second static file, not linked from the storefront, for the owner to manage product photos. Requires signing in with the owner's Supabase Auth account (create one in the dashboard: Authentication > Users > Add user). After signing in, pick a product from the searchable list, then drop in one or more images — any filename works, since photos are stored per product folder: `products/<PRODUCT_ID>/<anything>.jpg` in the `products` Storage bucket. After each upload, the page lists that folder, rebuilds the public URLs, and saves the ordered array into that product's `images` column (`images[0]` is the card/primary photo). Delete and reorder (‹ ›) buttons on each thumbnail update both Storage and the database. Keep the admin.html URL private regardless — signing in is the real gate, but there is no reason to advertise the page.
 
 ## Design system (keep consistent, inspired by the 3legant look: clean, white, airy)
 Colors:
