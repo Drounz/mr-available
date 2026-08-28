@@ -58,7 +58,12 @@ create policy "Public may update product photos"
 revoke update on products from anon, authenticated;
 grant update (images, image_url) on products to anon, authenticated;
 
--- No insert/delete policy for anyone from the browser: denied outright.
+-- Non-negotiable: a product is a row created only from the catalogue
+-- (Table Editor or the seed script's service-role key), never from an
+-- uploaded image. No insert/delete policy exists for products, and
+-- these explicit revokes make the browser's inability to create or
+-- delete a product true at the grant level too, not just by omission.
+revoke insert, delete on products from anon, authenticated;
 
 -- Product photos bucket: public read, uploads capped to images under 5MB.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)

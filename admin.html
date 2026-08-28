@@ -193,7 +193,13 @@ function setStatus(msg, kind){
 }
 
 async function uploadFiles(files){
-  if(!currentId) return;
+  // Non-negotiable: photos only ever attach to a product that already
+  // exists in the loaded catalogue. No selected (and real) product, no
+  // upload — this never creates a product, only appends to its images.
+  if(!currentId || !PRODUCTS.some(p=>p.id===currentId)){
+    setStatus("Pick a product from the list above before uploading.", "err");
+    return;
+  }
   setStatus(`Uploading ${files.length} photo${files.length!==1?'s':''}...`, "");
   for(const file of files){
     const ext = (file.name.match(/\.([^.]+)$/) || [,"jpg"])[1].toLowerCase();

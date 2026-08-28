@@ -35,6 +35,9 @@ These config values are safe in a public repo. Security is enforced by Row Level
 ## 5. Deploy
 Commit and let Vercel redeploy. The site flips from sample data to your live products.
 
+## One-time: clean up junk product rows
+If your `products` table ever picked up rows keyed by an image filename instead of a real product ID (e.g. `03-lg-dualcool-front`), run `supabase/cleanup-catalogue.sql` in the SQL Editor once. It deletes anything not in the real 101-ID catalogue and restores catalogue fields (name/price/published/etc.) for the real products from the seed, without touching any `images`/`image_url` already attached. Safe to re-run.
+
 ## Everyday use (your admin)
 - **Add a product**: Table Editor > products > insert row. Use the product code as `id`. Fields: `name`, `category`, `brand`, `selling_price` (number), optionally `model`, and `published` = true.
 - **Hide a product**: set `published` to false. It leaves the site, stays in the database.
