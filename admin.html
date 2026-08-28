@@ -49,6 +49,13 @@
   .status.ok{color:var(--ok)}
   .status.err{color:var(--err)}
   .hidden{display:none}
+  .descbox{margin-top:20px}
+  .descbox label{display:block;font-size:12.5px;font-weight:600;margin-bottom:6px}
+  .descbox textarea{width:100%;min-height:64px;padding:10px 13px;border:1px solid var(--line);border-radius:10px;font-size:13.5px;font-family:inherit;background:#fff;resize:vertical}
+  .descbox .btn{margin-top:8px;font-size:12.5px;font-weight:600;padding:8px 16px;border-radius:999px;background:var(--ink);color:#fff;border:none;cursor:pointer;font-family:inherit}
+  .descstatus{font-size:12px;margin-top:6px}
+  .descstatus.ok{color:var(--ok)}
+  .descstatus.err{color:var(--err)}
 </style>
 </head>
 <body>
@@ -69,6 +76,13 @@
     <div class="sname" id="selName"></div>
 
     <div class="thumbs" id="thumbs"></div>
+
+    <div class="descbox">
+      <label for="descInput">Short description (shows on the product page)</label>
+      <textarea id="descInput" placeholder="e.g. 1.5HP split inverter AC, quiet mode, remote included"></textarea>
+      <button class="btn" id="descSaveBtn">Save description</button>
+      <div class="descstatus hidden" id="descStatus"></div>
+    </div>
 
     <div class="drop" id="drop">
       <input type="file" id="fileInput" accept="image/*" multiple />
@@ -96,7 +110,7 @@ function naira(n){return "₦" + Number(n||0).toLocaleString("en-NG");}
 let PRODUCTS=[], currentId=null, currentImages=[];
 
 async function loadProducts(){
-  const { data, error } = await client.from("products").select("id,name,brand,category,published,selling_price").order("id");
+  const { data, error } = await client.from("products").select("id,name,brand,category,published,selling_price,description").order("id");
   if(error){ document.getElementById("plist").innerHTML = `<div class="prow" style="color:var(--err)">Could not load products.</div>`; return; }
   PRODUCTS = data||[];
   renderList("");
@@ -118,11 +132,34 @@ async function selectProduct(id){
   document.getElementById("selectedPanel").classList.remove("hidden");
   document.getElementById("selId").innerHTML = `<code>${escapeHtml(id)}</code>`;
   document.getElementById("selName").textContent = p ? `${p.brand} ${p.name}` : id;
+  document.getElementById("descInput").value = p ? (p.description||"") : "";
+  setDescStatus("", "");
   setStatus("", "");
   renderList(document.getElementById("search").value);
   await refreshImages(id, {persist:false});
 }
 window.selectProduct = selectProduct;
+
+function setDescStatus(msg, kind){
+  const el = document.getElementById("descStatus");
+  el.textContent = msg;
+  el.className = "descstatus" + (kind?(" "+kind):"") + (msg?"":" hidden");
+  if(!msg) el.classList.add("hidden");
+}
+async function saveDescription(){
+  if(!currentId || !PRODUCTS.some(p=>p.id===currentId)){
+    setDescStatus("Pick a product from the list above first.", "err");
+    return;
+  }
+  const value = document.getElementById("descInput").value.trim();
+  const { data, error } = await client.from("products").update({ description: value }).eq("id", currentId).select("id");
+  if(error){ setDescStatus("Could not save: " + error.message, "err"); return; }
+  if(!data || !data.length){ setDescStatus(`No product with ID "${currentId}" exists.`, "err"); return; }
+  const p = PRODUCTS.find(x=>x.id===currentId);
+  if(p) p.description = value;
+  setDescStatus("Saved.", "ok");
+}
+document.getElementById("descSaveBtn").addEventListener("click", saveDescription);
 
 function publicUrlFor(path){
   return client.storage.from("products").getPublicUrl(path).data.publicUrl;
