@@ -67,7 +67,7 @@
   .btn-ghost:hover{background:var(--soft2)}
 
   /* section head */
-  .sec{padding:34px 0}
+  .sec{padding-top:34px;padding-bottom:34px}
   .sechead{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px;gap:16px}
   .sechead h2{margin:0;font-size:clamp(1.5rem,4vw,2.1rem);font-weight:800;letter-spacing:-.03em;line-height:1.05}
   .seeall{font-size:13.5px;font-weight:600;color:var(--ink);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
@@ -206,6 +206,18 @@
 
   /* persona tiles reuse .cat look; add a short blurb line */
   .persona-tile .cc{margin-top:2px}
+
+  /* persona collection page: hero banner + about block */
+  .persona-hero{position:relative;border-radius:20px;overflow:hidden;background:var(--ink);aspect-ratio:16/7;display:flex;align-items:flex-end}
+  @media(max-width:639px){.persona-hero{aspect-ratio:4/3}}
+  .persona-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .persona-hero .scrim{position:absolute;inset:0;background:linear-gradient(to top,rgba(20,33,58,.8),rgba(20,33,58,.15) 55%,rgba(20,33,58,0))}
+  .persona-hero .hero-copy{position:relative;padding:22px;color:#fff}
+  .persona-hero .eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+  .persona-hero h1{margin:4px 0 0;font-size:clamp(1.6rem,4.5vw,2.5rem);font-weight:800;letter-spacing:-.02em;line-height:1.1}
+  .persona-about{margin:20px 0}
+  .persona-about .about-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 6px}
+  .persona-about .lead{margin:0;max-width:640px}
 
   /* product detail — slide-over panel */
   #panelBackdrop{position:fixed;inset:0;z-index:60;background:rgba(20,33,58,.5);opacity:0;pointer-events:none;transition:opacity .22s ease}
@@ -390,10 +402,11 @@
 
 <div class="wrap sec hidden" id="personaView">
   <a class="seeall" href="." onclick="return backToShop(event)">← Back to shop</a>
-  <div class="sechead" style="margin-top:18px">
-    <h2 id="personaTitle"></h2>
+  <div class="persona-hero" id="personaHero" style="margin-top:18px"></div>
+  <div class="persona-about hidden" id="personaAbout">
+    <h3 class="about-label">About this collection</h3>
+    <p class="lead" id="personaDesc"></p>
   </div>
-  <p class="lead" id="personaDesc"></p>
   <div class="grid" id="personaGridItems"></div>
   <div class="empty hidden" id="personaEmpty">No products set up for this collection yet — check back soon.</div>
   <a class="btn btn-wa hidden" id="personaSendBtn" target="_blank" rel="noreferrer" style="margin-top:20px">
@@ -539,11 +552,17 @@ const boxSVG = '<svg width="42" height="42" viewBox="0 0 24 24" fill="none" stro
 
 let PRODUCTS=[], CATS=["All"], state={cat:"All",q:"",bundle:{},open:false};
 
-async function loadProducts(){
+function sbClient(){
   const sb = CONFIG.supabase || {};
-  if(sb.url && sb.anonKey){
+  if(!(sb.url && sb.anonKey)) return null;
+  try{ return supabase.createClient(sb.url, sb.anonKey); }
+  catch(e){ return null; }
+}
+
+async function loadProducts(){
+  const client = sbClient();
+  if(client){
     try{
-      const client = supabase.createClient(sb.url, sb.anonKey);
       const { data, error } = await client.from("products").select("*").eq("published", true);
       if(error) throw error;
       const items = (data||[]).map(r=>{
@@ -571,6 +590,25 @@ async function loadProducts(){
     }
   }
   return { items: FALLBACK, live:false };
+}
+
+async function loadPersonas(){
+  const client = sbClient();
+  if(!client) return [];
+  try{
+    const { data, error } = await client.from("personas").select("*").order("sort_order");
+    if(error) throw error;
+    return (data||[]).map(r=>({
+      key: String(r.key||"").trim(),
+      title: String(r.title||"").trim(),
+      eyebrow: String(r.eyebrow||"").trim(),
+      about: String(r.about||"").trim(),
+      heroImageUrl: String(r.hero_image_url||"").trim(),
+      sortOrder: Number(r.sort_order)||0
+    })).filter(p=>p.key);
+  }catch(e){
+    return [];
+  }
 }
 
 function escapeHtml(s){return String(s||"").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
@@ -746,13 +784,9 @@ document.getElementById("footWa").href=helloLink;
    URL query param (?p=ID or ?persona=slug) so pages are shareable
    on static hosting with no server routing.
    ============================================================ */
-const PERSONAS=[
-  {slug:"first-nest",name:"First Nest",blurb:"Starting out together"},
-  {slug:"bachelor-pad",name:"Bachelor Pad",blurb:"Solo living, sorted"},
-  {slug:"her-space",name:"Her Space",blurb:"Comfort, her way"},
-  {slug:"new-home",name:"New Home",blurb:"Moving in, fully set"},
-  {slug:"shortlet-host",name:"Shortlet Host",blurb:"Guest-ready, always"}
-];
+// Loaded from the personas table (see loadPersonas) — never hardcoded,
+// so adding/editing a collection is a data change, not a code change.
+let PERSONAS=[];
 
 function qp(k){return new URLSearchParams(location.search).get(k);}
 function goTo(url){history.pushState({},"",url);route();}
@@ -773,14 +807,15 @@ window.backToShop=backToShop;window.goToProduct=goToProduct;window.goToPersona=g
    full-page. The product panel is a separate overlay layered on top of
    whichever base page is showing, toggled purely by the ?p= param, so
    opening/closing it never re-renders or scrolls the base page underneath. */
-let baseKey=null;
+let baseKey=null, baseTitle=null;
 function route(){
   const pid=qp("p"), persona=qp("persona");
   const newBaseKey = persona ? "persona:"+persona : "catalogue";
   if(newBaseKey!==baseKey){
     document.getElementById("catalogueView").classList.toggle("hidden",!!persona);
     document.getElementById("personaView").classList.toggle("hidden",!persona);
-    if(persona) renderPersonaView(persona); else render();
+    if(persona) renderPersonaView(persona); else { render(); document.title=DEFAULT_TITLE; }
+    baseTitle=document.title;
     baseKey=newBaseKey;
     window.scrollTo(0,0);
   }
@@ -799,7 +834,7 @@ function closePanelUI(){
   document.getElementById("productPanel").classList.remove("open");
   document.getElementById("panelBackdrop").classList.remove("open");
   document.body.style.overflow="";
-  document.title=DEFAULT_TITLE;
+  document.title=baseTitle;
 }
 function closePanel(e){
   if(e)e.preventDefault();
@@ -815,28 +850,57 @@ document.addEventListener("keydown",e=>{
 });
 
 function renderPersonaTiles(){
+  document.getElementById("personas").classList.toggle("hidden",PERSONAS.length===0);
   document.getElementById("personaGrid").innerHTML=PERSONAS.map(ps=>`
-    <a class="cat persona-tile" href="?persona=${ps.slug}" onclick="return goToPersona(event,'${ps.slug}')">
-      <div><div class="cn">${escapeHtml(ps.name)}</div><div class="cc">${escapeHtml(ps.blurb)}</div></div>
+    <a class="cat persona-tile" href="?persona=${encodeURIComponent(ps.key)}" onclick="return goToPersona(event,'${ps.key.replace(/'/g,"\\'")}')">
+      <div><div class="cn">${escapeHtml(ps.title||ps.key)}</div><div class="cc">${escapeHtml(ps.eyebrow)}</div></div>
       <span class="go">Shop →</span>
     </a>`).join("");
+}
+
+function personaHeroImgError(img){
+  const hero=img.closest(".persona-hero");
+  if(!hero)return;
+  const scrim=img.nextElementSibling;
+  img.remove();
+  if(scrim&&scrim.classList.contains("scrim")) scrim.remove();
+  hero.classList.add("solid");
+}
+window.personaHeroImgError=personaHeroImgError;
+
+function renderPersonaHero(meta){
+  const hero=document.getElementById("personaHero");
+  const eyebrow=escapeHtml(meta.eyebrow||"");
+  const title=escapeHtml(meta.title||meta.key);
+  const copy=`<div class="hero-copy"><div class="eyebrow">${eyebrow}</div><h1>${title}</h1></div>`;
+  hero.classList.remove("solid");
+  if(meta.heroImageUrl){
+    hero.innerHTML=`<img src="${escapeHtml(meta.heroImageUrl)}" alt="" onerror="personaHeroImgError(this)"/><div class="scrim"></div>${copy}`;
+  }else{
+    hero.classList.add("solid");
+    hero.innerHTML=copy;
+  }
 }
 
 function personaBundleMsg(items,meta){
   const lines=items.map(p=>`${p.name}${p.model?" ("+p.model+")":""} - ${naira(p.price)}`);
   const grandTotal=items.reduce((s,p)=>s+p.price,0);
-  return waLink(`Hello MR AVAILABLE, I'm interested in the ${meta?meta.name:"collection"} set:\n${lines.join("\n")}\n\nTotal: ${naira(grandTotal)}`);
+  return waLink(`Hello MR AVAILABLE, I'm interested in the ${meta?meta.title:"collection"} set:\n${lines.join("\n")}\n\nTotal: ${naira(grandTotal)}`);
 }
 function renderPersonaView(slug){
-  const meta=PERSONAS.find(ps=>ps.slug===slug);
+  const meta=PERSONAS.find(ps=>ps.key===slug);
   const list=PRODUCTS.filter(p=>p.personas&&p.personas.includes(slug));
-  document.getElementById("personaTitle").textContent=meta?meta.name:slug;
-  document.getElementById("personaDesc").textContent=meta?meta.blurb:"";
+  renderPersonaHero(meta||{key:slug,title:slug,eyebrow:"",heroImageUrl:""});
+  const aboutBlock=document.getElementById("personaAbout");
+  const about=meta?meta.about:"";
+  document.getElementById("personaDesc").textContent=about;
+  aboutBlock.classList.toggle("hidden",!about);
   document.getElementById("personaGridItems").innerHTML=list.map(cardHtml).join("");
   document.getElementById("personaEmpty").classList.toggle("hidden",list.length>0);
   const sendBtn=document.getElementById("personaSendBtn");
   sendBtn.classList.toggle("hidden",list.length===0);
   if(list.length) sendBtn.href=personaBundleMsg(list,meta);
+  document.title=(meta?meta.title:slug)+" — MR AVAILABLE";
 }
 
 function renderBrandWall(){
@@ -903,8 +967,9 @@ function renderDetail(id){
 }
 
 (async function(){
-  const {items:data,live,warn}=await loadProducts();
+  const [{items:data,live,warn},personas]=await Promise.all([loadProducts(),loadPersonas()]);
   PRODUCTS=data;
+  PERSONAS=personas.sort((a,b)=>a.sortOrder-b.sortOrder);
   CATS=["All",...Array.from(new Set(PRODUCTS.map(p=>p.cat))).sort()];
   if(warn) document.getElementById("notice").innerHTML=`<div class="notice">${escapeHtml(warn)}</div>`;
   else if(!live&&!(CONFIG.supabase&&CONFIG.supabase.url)) document.getElementById("notice").innerHTML=`<div class="notice">Preview mode: showing built-in sample data. Add your Supabase config in CONFIG to go live.</div>`;
