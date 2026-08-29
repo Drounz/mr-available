@@ -78,6 +78,46 @@ grant update (images, image_url, description, selling_price, published) on produ
 -- delete a product true at the grant level too, not just by omission.
 revoke insert, delete on products from anon, authenticated;
 
+-- Persona collections ("Shop by what you need"). Content (copy and hero
+-- images) is owner-managed data — the app only ever reads/writes rows
+-- here, it never hardcodes persona copy. Seeded once with the five
+-- collections (first-nest, bachelor-pad, her-space, new-home,
+-- shortlet-host); more rows can be added later the same way.
+create table if not exists personas (
+  key text primary key,
+  title text not null default '',
+  eyebrow text not null default '',
+  about text not null default '',
+  hero_image_url text not null default '',
+  sort_order int not null default 0
+);
+
+alter table personas enable row level security;
+
+-- Public storefront: anyone may read every persona (tiles + collection pages).
+drop policy if exists "Public read personas" on personas;
+create policy "Public read personas"
+  on personas for select
+  to anon, authenticated
+  using (true);
+
+-- Unlike products/admin.html, editing persona copy and hero images
+-- requires a real sign-in (Supabase Auth) — see the "Page images"
+-- section of admin.html. Anonymous visitors can never write here.
+drop policy if exists "Owner may update personas" on personas;
+create policy "Owner may update personas"
+  on personas for update
+  to authenticated
+  using (true)
+  with check (true);
+
+revoke update on personas from anon, authenticated;
+grant update (title, eyebrow, about, hero_image_url) on personas to authenticated;
+
+-- Rows are seeded/managed via the dashboard or service-role key, never
+-- created or deleted from the browser, signed in or not.
+revoke insert, delete on personas from anon, authenticated;
+
 -- Product photos bucket: public read, uploads capped to images under 5MB.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('products', 'products', true, 5242880, array['image/jpeg','image/png','image/webp','image/gif'])
@@ -113,3 +153,37 @@ create policy "Public delete product photos"
   on storage.objects for delete
   to public
   using (bucket_id = 'products');
+
+-- Site/page images bucket (hero banners, etc.) — separate from product
+-- photos. Path convention: personas/<persona_key>.<ext>, giving public
+-- URLs like .../object/public/site/personas/<key>.<ext>. Unlike the
+-- products bucket, writes here require a real sign-in: this is the one
+-- part of the storefront's write surface that isn't open to anon.
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('site', 'site', true, 5242880, array['image/jpeg','image/png','image/webp','image/gif'])
+on conflict (id) do nothing;
+
+drop policy if exists "Public read site images" on storage.objects;
+create policy "Public read site images"
+  on storage.objects for select
+  to public
+  using (bucket_id = 'site');
+
+drop policy if exists "Owner upload site images" on storage.objects;
+create policy "Owner upload site images"
+  on storage.objects for insert
+  to authenticated
+  with check (bucket_id = 'site');
+
+drop policy if exists "Owner overwrite site images" on storage.objects;
+create policy "Owner overwrite site images"
+  on storage.objects for update
+  to authenticated
+  using (bucket_id = 'site')
+  with check (bucket_id = 'site');
+
+drop policy if exists "Owner delete site images" on storage.objects;
+create policy "Owner delete site images"
+  on storage.objects for delete
+  to authenticated
+  using (bucket_id = 'site');

@@ -71,6 +71,26 @@
   .switch input:checked + .slider{background:var(--price)}
   .switch input:checked + .slider::before{transform:translateX(16px)}
   #publishedLabel{font-size:13px;font-weight:600}
+  .authbox input{width:100%;padding:10px 13px;border:1px solid var(--line);border-radius:10px;font-size:13.5px;font-family:inherit;background:#fff;margin-bottom:8px}
+  .authbox .btn{font-size:12.5px;font-weight:600;padding:8px 16px;border-radius:999px;background:var(--ink);color:#fff;border:none;cursor:pointer;font-family:inherit}
+  .authstatus{font-size:12px;margin-top:8px}
+  .authstatus.ok{color:var(--ok)}
+  .authstatus.err{color:var(--err)}
+  .authbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;font-size:12.5px;color:var(--muted)}
+  .authbar .btn{background:#fff;color:var(--ink);font-size:12px;font-weight:600;padding:6px 14px;border-radius:999px;border:1px solid var(--line);cursor:pointer;font-family:inherit}
+  .persona-row{border:1px solid var(--line);border-radius:14px;padding:16px;background:#fff;margin-bottom:14px}
+  .persona-row:last-child{margin-bottom:0}
+  .persona-row .prtitle{font-size:14px;font-weight:700;margin-bottom:10px}
+  .persona-hero-preview{position:relative;border-radius:10px;overflow:hidden;aspect-ratio:16/7;background:var(--soft);display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+  .persona-hero-preview img{width:100%;height:100%;object-fit:cover}
+  .persona-hero-preview .ph-empty{font-size:12px;color:var(--muted)}
+  .persona-row label{display:block;font-size:12px;font-weight:600;margin:10px 0 4px}
+  .persona-row input[type=text],.persona-row textarea{width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:10px;font-size:13px;font-family:inherit;background:#fff}
+  .persona-row textarea{min-height:56px;resize:vertical}
+  .persona-row .btn{margin-top:10px;margin-right:6px;font-size:12.5px;font-weight:600;padding:8px 16px;border-radius:999px;background:var(--ink);color:#fff;border:none;cursor:pointer;font-family:inherit}
+  .persona-status{font-size:12px;margin-top:8px}
+  .persona-status.ok{color:var(--ok)}
+  .persona-status.err{color:var(--err)}
 </style>
 </head>
 <body>
@@ -120,6 +140,28 @@
       <div class="ds">JPG or PNG, up to 5MB each. Any filename works — drop several at once for a gallery.</div>
     </div>
     <div class="status hidden" id="uploadStatus"></div>
+  </div>
+
+  <div class="card" id="pageImagesCard">
+    <h2>Page images</h2>
+    <p>Manage each collection's hero banner and copy. This is separate from the photo uploader above and needs a real sign-in.</p>
+
+    <div id="authGate">
+      <div class="authbox">
+        <input type="email" id="ownerEmail" placeholder="Email" autocomplete="username" />
+        <input type="password" id="ownerPassword" placeholder="Password" autocomplete="current-password" />
+        <button class="btn" id="signInBtn">Sign in</button>
+        <div class="authstatus hidden" id="authStatus"></div>
+      </div>
+    </div>
+
+    <div class="hidden" id="personaManager">
+      <div class="authbar">
+        <span id="signedInAs"></span>
+        <button class="btn" id="signOutBtn">Sign out</button>
+      </div>
+      <div id="personaList"></div>
+    </div>
   </div>
 
 </div>
@@ -345,6 +387,118 @@ fileInput.addEventListener("change", ()=>{ uploadFiles(Array.from(fileInput.file
 drop.addEventListener("drop", e=>{ uploadFiles(Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith("image/"))); });
 
 loadProducts();
+
+/* ============================================================
+   Page images (persona hero banners + copy) — the one part of
+   this page that requires a real sign-in. Everything above stays
+   open by design; RLS enforces this split server-side too (see
+   supabase/schema.sql), this UI gate is just the matching UX.
+   ============================================================ */
+let PERSONAS_ADMIN = [];
+
+function setAuthStatus(msg, kind){
+  const el = document.getElementById("authStatus");
+  el.textContent = msg;
+  el.className = "authstatus" + (kind?(" "+kind):"") + (msg?"":" hidden");
+  if(!msg) el.classList.add("hidden");
+}
+async function signIn(){
+  const email = document.getElementById("ownerEmail").value.trim();
+  const password = document.getElementById("ownerPassword").value;
+  if(!email || !password){ setAuthStatus("Enter email and password.", "err"); return; }
+  setAuthStatus("Signing in...", "");
+  const { error } = await client.auth.signInWithPassword({ email, password });
+  if(error){ setAuthStatus(error.message, "err"); return; }
+  setAuthStatus("", "");
+}
+document.getElementById("signInBtn").addEventListener("click", signIn);
+document.getElementById("signOutBtn").addEventListener("click", ()=>client.auth.signOut());
+
+function renderAuthState(user){
+  document.getElementById("authGate").classList.toggle("hidden", !!user);
+  document.getElementById("personaManager").classList.toggle("hidden", !user);
+  if(user){
+    document.getElementById("signedInAs").textContent = "Signed in as " + user.email;
+    loadPersonasAdmin();
+  }
+}
+
+async function loadPersonasAdmin(){
+  const { data, error } = await client.from("personas").select("*").order("sort_order");
+  if(error){ document.getElementById("personaList").innerHTML = `<div class="status err">Could not load: ${escapeHtml(error.message)}</div>`; return; }
+  PERSONAS_ADMIN = data || [];
+  renderPersonaList();
+}
+
+// Renders whatever rows the personas table has — not hardcoded to any
+// fixed set, so adding a row (another collection, or later a homepage
+// hero) just appears here with no code change.
+function renderPersonaList(){
+  document.getElementById("personaList").innerHTML = PERSONAS_ADMIN.map(p=>`
+    <div class="persona-row" data-key="${escapeHtml(p.key)}">
+      <div class="prtitle">${escapeHtml(p.title || p.key)}</div>
+      <div class="persona-hero-preview">${p.hero_image_url ? `<img src="${escapeHtml(p.hero_image_url)}" alt=""/>` : `<span class="ph-empty">No image yet</span>`}</div>
+      <input type="file" class="persona-file-input hidden" accept="image/*" />
+      <button class="btn persona-upload-btn" type="button">Upload / Replace</button>
+      <label>Eyebrow</label>
+      <input type="text" class="persona-eyebrow" value="${escapeHtml(p.eyebrow||"")}" />
+      <label>Title</label>
+      <input type="text" class="persona-title" value="${escapeHtml(p.title||"")}" />
+      <label>About</label>
+      <textarea class="persona-about">${escapeHtml(p.about||"")}</textarea>
+      <button class="btn persona-save-btn" type="button">Save text</button>
+      <div class="persona-status hidden"></div>
+    </div>`).join("") || `<div class="status">No persona rows found.</div>`;
+
+  document.querySelectorAll(".persona-row").forEach(row=>{
+    const key = row.dataset.key;
+    row.querySelector(".persona-upload-btn").addEventListener("click", ()=>row.querySelector(".persona-file-input").click());
+    row.querySelector(".persona-file-input").addEventListener("change", e=>{
+      const file = e.target.files[0];
+      if(file) uploadPersonaHero(key, file, row);
+      e.target.value = "";
+    });
+    row.querySelector(".persona-save-btn").addEventListener("click", ()=>savePersonaText(key, row));
+  });
+}
+
+function setPersonaRowStatus(row, msg, kind){
+  const el = row.querySelector(".persona-status");
+  el.textContent = msg;
+  el.className = "persona-status" + (kind?(" "+kind):"") + (msg?"":" hidden");
+  if(!msg) el.classList.add("hidden");
+}
+
+async function uploadPersonaHero(key, file, row){
+  setPersonaRowStatus(row, "Uploading...", "");
+  const ext = (file.name.match(/\.([^.]+)$/) || [,"jpg"])[1].toLowerCase();
+  const path = `personas/${key}.${ext}`;
+  const { error: upErr } = await client.storage.from("site").upload(path, file, { upsert: true, contentType: file.type || "image/jpeg" });
+  if(upErr){ setPersonaRowStatus(row, "Upload failed: " + upErr.message, "err"); return; }
+  const url = client.storage.from("site").getPublicUrl(path).data.publicUrl;
+  const { data, error } = await client.from("personas").update({ hero_image_url: url }).eq("key", key).select("key");
+  if(error){ setPersonaRowStatus(row, "Could not save: " + error.message, "err"); return; }
+  if(!data || !data.length){ setPersonaRowStatus(row, `No persona with key "${key}" exists.`, "err"); return; }
+  const p = PERSONAS_ADMIN.find(x=>x.key===key);
+  if(p) p.hero_image_url = url;
+  row.querySelector(".persona-hero-preview").innerHTML = `<img src="${escapeHtml(url)}?v=${Date.now()}" alt=""/>`;
+  setPersonaRowStatus(row, "Saved.", "ok");
+}
+
+async function savePersonaText(key, row){
+  const eyebrow = row.querySelector(".persona-eyebrow").value.trim();
+  const title = row.querySelector(".persona-title").value.trim();
+  const about = row.querySelector(".persona-about").value.trim();
+  const { data, error } = await client.from("personas").update({ eyebrow, title, about }).eq("key", key).select("key");
+  if(error){ setPersonaRowStatus(row, "Could not save: " + error.message, "err"); return; }
+  if(!data || !data.length){ setPersonaRowStatus(row, `No persona with key "${key}" exists.`, "err"); return; }
+  const p = PERSONAS_ADMIN.find(x=>x.key===key);
+  if(p){ p.eyebrow=eyebrow; p.title=title; p.about=about; }
+  setPersonaRowStatus(row, "Saved.", "ok");
+}
+
+client.auth.getSession().then(({ data }) => renderAuthState(data.session ? data.session.user : null));
+client.auth.onAuthStateChange((event, session) => renderAuthState(session ? session.user : null));
 </script>
 </body>
 </html>
