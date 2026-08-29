@@ -17,8 +17,8 @@ Files (drop these into the repo):
 1. In the Supabase dashboard, open **SQL Editor > New query**.
 2. Paste the contents of `supabase/schema.sql` and click **Run**.
    This creates the `products` table (including the `images` gallery, `description`, and `personas` columns), the `personas` table (the "shop by what you need" collections' copy and hero images), the storage buckets for product photos and page images, and the security policies:
-   - `products`: anyone can read every product and update its photos, description, selling price, or published status, but never its name, category, brand, `personas`, or id, and never create or delete a product, from the browser. No login is required by deliberate choice — `admin.html` has no sign-in for this part, so keep its URL private; that matters more now that price and publish status are editable from the page.
-   - `personas`: anyone can read every row (the storefront needs this with no login), but only a signed-in owner can update a persona's title/eyebrow/about/hero image. See section 4b for the one-time step of creating that sign-in.
+   - `products`: anyone can read every product and update its photos, description, selling price, or published status, but never its name, category, brand, `personas`, or id, and never create or delete a product, from the browser. No login is required by deliberate choice — `admin.html` has no sign-in, so keep its URL private; that matters more now that price and publish status are editable from the page.
+   - `personas`: anyone can read every row, and can update its title/eyebrow/about/hero image — no login here either, same choice as `products`.
    This file is safe to re-run any time it changes (e.g. after an update to this repo) — every statement is idempotent.
 
 ## 3. Load your 50 products
@@ -30,15 +30,10 @@ Files (drop these into the repo):
 ## 4. Connect the site and turn on photo uploads
 1. Dashboard: **Project settings > API**. Copy the **Project URL** and the **anon public** key (not the service_role key — this one is safe to expose).
 2. In both `index.html` and `admin.html`, paste them into `CONFIG.supabase` (`url` and `anonKey`).
-3. `admin.html` is part of the deployed site (e.g. `yoursite.com/admin.html`) but not linked from the storefront and has no login for the product section — keep the link to yourself. Search for a product and drop in one or more photos — any filename works, since photos live in a folder per product (`products/<PRODUCT_ID>/...` in Storage) rather than needing to match the ID themselves. The first photo is the card image; add more for a gallery. Delete and reorder buttons appear on each thumbnail. A description box sets the short spec line shown on the product's page. A price field sets `selling_price`, and a Published switch flips the product live or hidden — the switch won't turn on while the price is still ₦0, since a zero-priced product never shows on the storefront anyway.
+3. `admin.html` is part of the deployed site (e.g. `yoursite.com/admin.html`) but not linked from the storefront and has no login anywhere on the page — keep the link to yourself. Search for a product and drop in one or more photos — any filename works, since photos live in a folder per product (`products/<PRODUCT_ID>/...` in Storage) rather than needing to match the ID themselves. The first photo is the card image; add more for a gallery. Delete and reorder buttons appear on each thumbnail. A description box sets the short spec line shown on the product's page. A price field sets `selling_price`, and a Published switch flips the product live or hidden — the switch won't turn on while the price is still ₦0, since a zero-priced product never shows on the storefront anyway.
+4. Further down the same page, **Page images** lists every row from the `personas` table with an image preview, an Upload / Replace button, and editable Eyebrow/Title/About fields with a Save button — also no login. Uploading writes to `site/personas/<key>.<ext>` in Storage and updates that row's `hero_image_url`; replacing overwrites the same file. This list grows automatically if more rows are added to `personas` later — nothing in `admin.html` is hardcoded to today's five collections.
 
 These config values are safe in a public repo. Security is enforced by Row Level Security, not by hiding the config.
-
-## 4b. Set up sign-in for page images (one-time)
-The "Page images" section further down `admin.html` manages each persona collection's hero banner and copy, and — unlike the rest of the page — it requires a real sign-in, because it writes to public data (the `personas` table and `site` Storage bucket both public may read). To set that up:
-1. Dashboard: **Authentication > Users > Add user**. Create yourself an email + password (or use a magic-link/invite if you prefer — any Supabase Auth method that ends in an authenticated session works). This repo has no way to create this account for you; it must be done once from the dashboard.
-2. On `admin.html`, scroll to **Page images** and sign in with that email/password.
-3. Once signed in, you'll see every row from the `personas` table with an image preview, an Upload / Replace button, and editable Eyebrow/Title/About fields with a Save button. Uploading writes to `site/personas/<key>.<ext>` in Storage and updates that row's `hero_image_url`; replacing overwrites the same file. This same list grows automatically if more rows are added to `personas` later — nothing in `admin.html` is hardcoded to today's five collections.
 
 ## 5. Deploy
 Commit and let Vercel redeploy. The site flips from sample data to your live products.
@@ -50,7 +45,7 @@ If your `products` table ever picked up rows keyed by an image filename instead 
 - **Add a product**: Table Editor > products > insert row. Use the product code as `id`. Fields: `name`, `category`, `brand`, `selling_price` (number), optionally `model`. Leave `published` false until it has a real price and at least one photo.
 - **Publish or hide a product, change its price, add photos or a description**: use `admin.html` (see section 4) — pick the product, then use the price field, the Published switch, the description box, and the photo dropzone. Editing `selling_price`/`published`/`description` by hand in the Table Editor works too; photos need `admin.html` (or building the public Storage URLs yourself) since it also handles Storage uploads and the `images`/`image_url` columns.
 - **Tag a product to a persona** ("Shop by what you need" collections): not yet in `admin.html` — edit the `personas` array column on that product's row in the Table Editor (e.g. `{bachelor-pad}` or `{bachelor-pad,new-home}`). Valid keys are whatever's in the `personas` table's `key` column (seeded with `first-nest`, `bachelor-pad`, `her-space`, `new-home`, `shortlet-host`). Only tag products that are published with a real price.
-- **Edit a persona's hero image or copy** (title/eyebrow/about): use `admin.html`'s "Page images" section — see section 4b for the one-time sign-in setup. Editing the `personas` table by hand in the Table Editor works too.
+- **Edit a persona's hero image or copy** (title/eyebrow/about): use `admin.html`'s "Page images" section (see section 4). Editing the `personas` table by hand in the Table Editor works too.
 
 ## Notes
 - Cost prices are intentionally NOT stored in this table — keep your cost and margin records in your central sheet. (Unlike Firestore, Postgres *can* protect single columns with different rules, so this is a choice for simplicity, not a technical limit.)

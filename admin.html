@@ -71,13 +71,6 @@
   .switch input:checked + .slider{background:var(--price)}
   .switch input:checked + .slider::before{transform:translateX(16px)}
   #publishedLabel{font-size:13px;font-weight:600}
-  .authbox input{width:100%;padding:10px 13px;border:1px solid var(--line);border-radius:10px;font-size:13.5px;font-family:inherit;background:#fff;margin-bottom:8px}
-  .authbox .btn{font-size:12.5px;font-weight:600;padding:8px 16px;border-radius:999px;background:var(--ink);color:#fff;border:none;cursor:pointer;font-family:inherit}
-  .authstatus{font-size:12px;margin-top:8px}
-  .authstatus.ok{color:var(--ok)}
-  .authstatus.err{color:var(--err)}
-  .authbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;font-size:12.5px;color:var(--muted)}
-  .authbar .btn{background:#fff;color:var(--ink);font-size:12px;font-weight:600;padding:6px 14px;border-radius:999px;border:1px solid var(--line);cursor:pointer;font-family:inherit}
   .persona-row{border:1px solid var(--line);border-radius:14px;padding:16px;background:#fff;margin-bottom:14px}
   .persona-row:last-child{margin-bottom:0}
   .persona-row .prtitle{font-size:14px;font-weight:700;margin-bottom:10px}
@@ -97,7 +90,7 @@
 <div class="wrap">
 
   <h1>Photo uploader</h1>
-  <p class="lead">Upload product photos here. This page is not linked from the storefront and does not require a login — keep the URL to yourself.</p>
+  <p class="lead">Manage product photos and page images here. This page is not linked from the storefront and does not require a login — keep the URL to yourself.</p>
 
   <div class="card">
     <h2>Pick a product</h2>
@@ -144,24 +137,8 @@
 
   <div class="card" id="pageImagesCard">
     <h2>Page images</h2>
-    <p>Manage each collection's hero banner and copy. This is separate from the photo uploader above and needs a real sign-in.</p>
-
-    <div id="authGate">
-      <div class="authbox">
-        <input type="email" id="ownerEmail" placeholder="Email" autocomplete="username" />
-        <input type="password" id="ownerPassword" placeholder="Password" autocomplete="current-password" />
-        <button class="btn" id="signInBtn">Sign in</button>
-        <div class="authstatus hidden" id="authStatus"></div>
-      </div>
-    </div>
-
-    <div class="hidden" id="personaManager">
-      <div class="authbar">
-        <span id="signedInAs"></span>
-        <button class="btn" id="signOutBtn">Sign out</button>
-      </div>
-      <div id="personaList"></div>
-    </div>
+    <p>Manage each collection's hero banner and copy. No login here either — keep this URL to yourself.</p>
+    <div id="personaList"></div>
   </div>
 
 </div>
@@ -389,39 +366,12 @@ drop.addEventListener("drop", e=>{ uploadFiles(Array.from(e.dataTransfer.files).
 loadProducts();
 
 /* ============================================================
-   Page images (persona hero banners + copy) — the one part of
-   this page that requires a real sign-in. Everything above stays
-   open by design; RLS enforces this split server-side too (see
-   supabase/schema.sql), this UI gate is just the matching UX.
+   Page images (persona hero banners + copy). No login, same as
+   the product section above — RLS on personas/site now grants
+   anon write too (see supabase/schema.sql), matching the rest of
+   this page's security model: open by design, URL kept private.
    ============================================================ */
 let PERSONAS_ADMIN = [];
-
-function setAuthStatus(msg, kind){
-  const el = document.getElementById("authStatus");
-  el.textContent = msg;
-  el.className = "authstatus" + (kind?(" "+kind):"") + (msg?"":" hidden");
-  if(!msg) el.classList.add("hidden");
-}
-async function signIn(){
-  const email = document.getElementById("ownerEmail").value.trim();
-  const password = document.getElementById("ownerPassword").value;
-  if(!email || !password){ setAuthStatus("Enter email and password.", "err"); return; }
-  setAuthStatus("Signing in...", "");
-  const { error } = await client.auth.signInWithPassword({ email, password });
-  if(error){ setAuthStatus(error.message, "err"); return; }
-  setAuthStatus("", "");
-}
-document.getElementById("signInBtn").addEventListener("click", signIn);
-document.getElementById("signOutBtn").addEventListener("click", ()=>client.auth.signOut());
-
-function renderAuthState(user){
-  document.getElementById("authGate").classList.toggle("hidden", !!user);
-  document.getElementById("personaManager").classList.toggle("hidden", !user);
-  if(user){
-    document.getElementById("signedInAs").textContent = "Signed in as " + user.email;
-    loadPersonasAdmin();
-  }
-}
 
 async function loadPersonasAdmin(){
   const { data, error } = await client.from("personas").select("*").order("sort_order");
@@ -497,8 +447,7 @@ async function savePersonaText(key, row){
   setPersonaRowStatus(row, "Saved.", "ok");
 }
 
-client.auth.getSession().then(({ data }) => renderAuthState(data.session ? data.session.user : null));
-client.auth.onAuthStateChange((event, session) => renderAuthState(session ? session.user : null));
+loadPersonasAdmin();
 </script>
 </body>
 </html>
