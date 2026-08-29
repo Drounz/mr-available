@@ -56,6 +56,21 @@
   .descstatus{font-size:12px;margin-top:6px}
   .descstatus.ok{color:var(--ok)}
   .descstatus.err{color:var(--err)}
+  .pricebox{margin-top:20px}
+  .pricebox label{display:block;font-size:12.5px;font-weight:600;margin-bottom:6px}
+  .pricebox input{width:100%;padding:10px 13px;border:1px solid var(--line);border-radius:10px;font-size:13.5px;font-family:inherit;background:#fff}
+  .pricebox .btn{margin-top:8px;font-size:12.5px;font-weight:600;padding:8px 16px;border-radius:999px;background:var(--ink);color:#fff;border:none;cursor:pointer;font-family:inherit}
+  .pricestatus{font-size:12px;margin-top:6px}
+  .pricestatus.ok{color:var(--ok)}
+  .pricestatus.err{color:var(--err)}
+  .publishrow{margin-top:18px;display:flex;align-items:center;gap:10px}
+  .switch{position:relative;display:inline-block;width:40px;height:24px;flex:0 0 auto}
+  .switch input{opacity:0;width:0;height:0}
+  .switch .slider{position:absolute;inset:0;background:var(--line);border-radius:999px;cursor:pointer;transition:background .15s}
+  .switch .slider::before{content:"";position:absolute;height:18px;width:18px;left:3px;top:3px;background:#fff;border-radius:999px;transition:transform .15s;box-shadow:0 1px 3px rgba(20,33,58,.3)}
+  .switch input:checked + .slider{background:var(--price)}
+  .switch input:checked + .slider::before{transform:translateX(16px)}
+  #publishedLabel{font-size:13px;font-weight:600}
 </style>
 </head>
 <body>
@@ -82,6 +97,21 @@
       <textarea id="descInput" placeholder="e.g. 1.5HP split inverter AC, quiet mode, remote included"></textarea>
       <button class="btn" id="descSaveBtn">Save description</button>
       <div class="descstatus hidden" id="descStatus"></div>
+    </div>
+
+    <div class="pricebox">
+      <label for="priceInput">Selling price (₦)</label>
+      <input type="number" id="priceInput" min="0" step="1" placeholder="e.g. 450000" />
+      <button class="btn" id="priceSaveBtn">Save price</button>
+      <div class="pricestatus hidden" id="priceStatus"></div>
+    </div>
+
+    <div class="publishrow">
+      <label class="switch">
+        <input type="checkbox" id="publishedToggle" />
+        <span class="slider"></span>
+      </label>
+      <span id="publishedLabel">Unpublished</span>
     </div>
 
     <div class="drop" id="drop">
@@ -133,12 +163,70 @@ async function selectProduct(id){
   document.getElementById("selId").innerHTML = `<code>${escapeHtml(id)}</code>`;
   document.getElementById("selName").textContent = p ? `${p.brand} ${p.name}` : id;
   document.getElementById("descInput").value = p ? (p.description||"") : "";
+  document.getElementById("priceInput").value = p && p.selling_price ? p.selling_price : "";
+  document.getElementById("publishedToggle").checked = !!(p && p.published);
+  setPublishedLabel(!!(p && p.published));
   setDescStatus("", "");
+  setPriceStatus("", "");
   setStatus("", "");
   renderList(document.getElementById("search").value);
   await refreshImages(id, {persist:false});
 }
 window.selectProduct = selectProduct;
+
+function setPublishedLabel(published){
+  document.getElementById("publishedLabel").textContent = published ? "Published" : "Unpublished";
+}
+
+function setPriceStatus(msg, kind){
+  const el = document.getElementById("priceStatus");
+  el.textContent = msg;
+  el.className = "pricestatus" + (kind?(" "+kind):"") + (msg?"":" hidden");
+  if(!msg) el.classList.add("hidden");
+}
+async function savePrice(){
+  if(!currentId || !PRODUCTS.some(p=>p.id===currentId)){
+    setPriceStatus("Pick a product from the list above first.", "err");
+    return;
+  }
+  const raw = document.getElementById("priceInput").value;
+  const value = Number(raw);
+  if(raw==="" || !Number.isFinite(value) || value<0){
+    setPriceStatus("Enter a valid price.", "err");
+    return;
+  }
+  const { data, error } = await client.from("products").update({ selling_price: value }).eq("id", currentId).select("id");
+  if(error){ setPriceStatus("Could not save: " + error.message, "err"); return; }
+  if(!data || !data.length){ setPriceStatus(`No product with ID "${currentId}" exists.`, "err"); return; }
+  const p = PRODUCTS.find(x=>x.id===currentId);
+  if(p) p.selling_price = value;
+  renderList(document.getElementById("search").value);
+  setPriceStatus("Saved.", "ok");
+}
+document.getElementById("priceSaveBtn").addEventListener("click", savePrice);
+
+async function togglePublished(){
+  const toggle = document.getElementById("publishedToggle");
+  if(!currentId || !PRODUCTS.some(p=>p.id===currentId)){
+    toggle.checked = !toggle.checked;
+    return;
+  }
+  const value = toggle.checked;
+  const current = PRODUCTS.find(x=>x.id===currentId);
+  if(value && (!current || !current.selling_price)){
+    toggle.checked = false;
+    alert("Set and save a selling price before publishing — the storefront hides any product priced at ₦0.");
+    return;
+  }
+  const { data, error } = await client.from("products").update({ published: value }).eq("id", currentId).select("id");
+  if(error){ toggle.checked = !value; alert("Could not save: " + error.message); return; }
+  if(!data || !data.length){ toggle.checked = !value; alert(`No product with ID "${currentId}" exists.`); return; }
+  const p = PRODUCTS.find(x=>x.id===currentId);
+  if(p) p.published = value;
+  setPublishedLabel(value);
+  renderList(document.getElementById("search").value);
+}
+document.getElementById("publishedToggle").addEventListener("change", togglePublished);
 
 function setDescStatus(msg, kind){
   const el = document.getElementById("descStatus");
