@@ -101,21 +101,23 @@ create policy "Public read personas"
   to anon, authenticated
   using (true);
 
--- Unlike products/admin.html, editing persona copy and hero images
--- requires a real sign-in (Supabase Auth) — see the "Page images"
--- section of admin.html. Anonymous visitors can never write here.
+-- No login by deliberate choice, same as products/admin.html: anyone
+-- with the admin.html link may write, but the column grant below is
+-- still the only thing stopping them from touching anything else — the
+-- key and sort_order stay out of reach from the browser no matter what.
 drop policy if exists "Owner may update personas" on personas;
-create policy "Owner may update personas"
+drop policy if exists "Public may update personas" on personas;
+create policy "Public may update personas"
   on personas for update
-  to authenticated
+  to anon, authenticated
   using (true)
   with check (true);
 
 revoke update on personas from anon, authenticated;
-grant update (title, eyebrow, about, hero_image_url) on personas to authenticated;
+grant update (title, eyebrow, about, hero_image_url) on personas to anon, authenticated;
 
 -- Rows are seeded/managed via the dashboard or service-role key, never
--- created or deleted from the browser, signed in or not.
+-- created or deleted from the browser.
 revoke insert, delete on personas from anon, authenticated;
 
 -- Product photos bucket: public read, uploads capped to images under 5MB.
@@ -156,9 +158,8 @@ create policy "Public delete product photos"
 
 -- Site/page images bucket (hero banners, etc.) — separate from product
 -- photos. Path convention: personas/<persona_key>.<ext>, giving public
--- URLs like .../object/public/site/personas/<key>.<ext>. Unlike the
--- products bucket, writes here require a real sign-in: this is the one
--- part of the storefront's write surface that isn't open to anon.
+-- URLs like .../object/public/site/personas/<key>.<ext>. Open to anon,
+-- same as the products bucket — no login on admin.html, by choice.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('site', 'site', true, 5242880, array['image/jpeg','image/png','image/webp','image/gif'])
 on conflict (id) do nothing;
@@ -170,20 +171,23 @@ create policy "Public read site images"
   using (bucket_id = 'site');
 
 drop policy if exists "Owner upload site images" on storage.objects;
-create policy "Owner upload site images"
+drop policy if exists "Public upload site images" on storage.objects;
+create policy "Public upload site images"
   on storage.objects for insert
-  to authenticated
+  to public
   with check (bucket_id = 'site');
 
 drop policy if exists "Owner overwrite site images" on storage.objects;
-create policy "Owner overwrite site images"
+drop policy if exists "Public overwrite site images" on storage.objects;
+create policy "Public overwrite site images"
   on storage.objects for update
-  to authenticated
+  to public
   using (bucket_id = 'site')
   with check (bucket_id = 'site');
 
 drop policy if exists "Owner delete site images" on storage.objects;
-create policy "Owner delete site images"
+drop policy if exists "Public delete site images" on storage.objects;
+create policy "Public delete site images"
   on storage.objects for delete
-  to authenticated
+  to public
   using (bucket_id = 'site');
