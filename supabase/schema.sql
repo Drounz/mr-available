@@ -51,10 +51,14 @@ create policy "Anyone may read all products"
   using (true);
 
 -- No login by deliberate choice: anyone with the admin.html link may
--- write, but the column grant below means images/image_url are the
--- ONLY columns they can actually change — no price, name, or published
--- edits are possible from the browser. No insert/delete policy exists,
--- so creating or deleting products from the browser is denied outright.
+-- write, but the column grant below is still the only thing stopping
+-- them from touching anything else — name, category, brand, and id stay
+-- out of reach from the browser no matter what. selling_price and
+-- published ARE in this grant (admin.html has a price field and a
+-- publish toggle), so anyone who gets hold of the admin.html link can
+-- change a price or flip a product's visibility. Keep that link private.
+-- No insert/delete policy exists, so creating or deleting products from
+-- the browser is denied outright regardless of this grant.
 drop policy if exists "Public may update image_url only" on products;
 drop policy if exists "Owner may update product photos" on products;
 drop policy if exists "Public may update product photos" on products;
@@ -65,7 +69,7 @@ create policy "Public may update product photos"
   with check (true);
 
 revoke update on products from anon, authenticated;
-grant update (images, image_url, description) on products to anon, authenticated;
+grant update (images, image_url, description, selling_price, published) on products to anon, authenticated;
 
 -- Non-negotiable: a product is a row created only from the catalogue
 -- (Table Editor or the seed script's service-role key), never from an
