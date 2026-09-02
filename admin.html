@@ -386,7 +386,7 @@ async function loadPersonasAdmin(){
 function renderPersonaList(){
   document.getElementById("personaList").innerHTML = PERSONAS_ADMIN.map(p=>`
     <div class="persona-row" data-key="${escapeHtml(p.key)}">
-      <div class="prtitle">${escapeHtml(p.title || p.key)}</div>
+      <div class="prtitle">${p.key === "home-hero" ? "Homepage hero" : escapeHtml(p.title || p.key)}</div>
       <div class="persona-hero-preview">${p.hero_image_url ? `<img src="${escapeHtml(p.hero_image_url)}" alt=""/>` : `<span class="ph-empty">No image yet</span>`}</div>
       <input type="file" class="persona-file-input hidden" accept="image/*" />
       <button class="btn persona-upload-btn" type="button">Upload / Replace</button>
@@ -422,7 +422,7 @@ function setPersonaRowStatus(row, msg, kind){
 async function uploadPersonaHero(key, file, row){
   setPersonaRowStatus(row, "Uploading...", "");
   const ext = (file.name.match(/\.([^.]+)$/) || [,"jpg"])[1].toLowerCase();
-  const path = `personas/${key}.${ext}`;
+  const path = key === "home-hero" ? `home-hero.${ext}` : `personas/${key}.${ext}`;
   const { error: upErr } = await client.storage.from("site").upload(path, file, { upsert: true, contentType: file.type || "image/jpeg" });
   if(upErr){ setPersonaRowStatus(row, "Upload failed: " + upErr.message, "err"); return; }
   const url = client.storage.from("site").getPublicUrl(path).data.publicUrl;

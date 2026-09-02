@@ -48,10 +48,15 @@
   .cartbtn .badge{position:absolute;top:-6px;right:-6px;background:var(--accent);color:var(--ink);font-size:11px;font-weight:700;height:20px;min-width:20px;padding:0 5px;border-radius:999px;display:flex;align-items:center;justify-content:center}
   @media(min-width:900px){.navlinks{display:flex}}
 
-  /* hero */
-  .hero{padding:56px 0 40px}
-  .hero-grid{display:grid;gap:22px;grid-template-columns:1fr}
-  @media(min-width:820px){.hero-grid{grid-template-columns:1.4fr 1fr;align-items:end}}
+  /* homepage hero (admin-managed photo, same pattern as persona heroes) */
+  .home-hero-wrap{padding:40px 0 8px}
+  .home-hero{position:relative;border-radius:24px;overflow:hidden;background:var(--ink);aspect-ratio:4/3;display:flex;align-items:flex-end}
+  @media(min-width:640px){.home-hero{aspect-ratio:21/9}}
+  .home-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .home-hero .scrim{position:absolute;inset:0;background:linear-gradient(to top,rgba(20,33,58,.82),rgba(20,33,58,.25) 55%,rgba(20,33,58,0))}
+  .home-hero .hero-copy{position:relative;padding:28px;max-width:560px}
+  .home-hero h1.head{color:#fff}
+  .home-hero .lead{color:rgba(255,255,255,.85)}
   h1.head{margin:0;font-weight:800;letter-spacing:-.035em;font-size:clamp(2.3rem,7vw,4.2rem);line-height:.98}
   h1.head .sl{color:var(--line);font-weight:500}
   h1.head .dot{color:var(--accent)}
@@ -253,7 +258,6 @@
     <a class="logo" href="#top"><span class="mr">MR</span><span class="nm">AVAILABLE<b>.</b></span></a>
     <nav class="navlinks">
       <a href="#shop">Shop</a>
-      <a href="#categories">Categories</a>
       <a href="#contact">Contact</a>
     </nav>
     <div class="navright">
@@ -270,16 +274,16 @@
 
 <a id="top"></a>
 <div id="catalogueView">
-<section class="wrap hero">
-  <div class="hero-grid">
-    <h1 class="head">Everything for the home<span class="sl">/</span><br>in stock, priced fair<span class="dot">.</span></h1>
-    <div>
-      <p class="lead">MR AVAILABLE is your home appliances and electronics store. Browse real stock, build a bundle, and order in one tap on WhatsApp.</p>
+<section class="wrap home-hero-wrap">
+  <div class="home-hero" id="homeHero">
+    <div class="hero-copy">
+      <h1 class="head">Everything for the home<span class="dot">.</span></h1>
+      <p class="lead">Real stock, fair prices, ordered on WhatsApp.</p>
       <div class="cta-row">
         <a class="btn btn-dark" href="#shop">Shop all</a>
         <a class="btn btn-wa" id="heroWa" target="_blank" rel="noreferrer">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2Zm5.6 14.2c-.2.6-1.2 1.2-1.7 1.2-.4 0-1 .1-3.2-.9-2.7-1.2-4.4-4-4.5-4.2-.1-.2-1-1.4-1-2.6 0-1.2.6-1.8.9-2 .2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6c-.1.2-.3.3-.1.6.1.3.7 1.1 1.4 1.7.9.8 1.6 1 1.9 1.2.2.1.4.1.5-.1l.7-.8c.2-.2.3-.2.6-.1l1.9.9c.2.1.4.2.5.3.1.3.1.7-.1 1.1Z"/></svg>
-          Chat with us
+          WhatsApp
         </a>
       </div>
     </div>
@@ -292,21 +296,6 @@
   <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Order on WhatsApp</span>
   <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Confirm before you pay</span>
 </div>
-
-<section class="wrap sec" id="personas">
-  <div class="sechead">
-    <h2>Shop by what you need</h2>
-  </div>
-  <div class="cats" id="personaGrid"></div>
-</section>
-
-<section class="wrap sec" id="categories">
-  <div class="sechead">
-    <h2>Shop by category</h2>
-    <a class="seeall" href="#shop" onclick="setCat('All')">View all →</a>
-  </div>
-  <div class="cats" id="catGrid"></div>
-</section>
 
 <section class="wrap sec" id="shop">
   <div class="sechead">
@@ -323,6 +312,13 @@
   <div class="grid" id="grid"></div>
   <div class="empty hidden" id="empty">Nothing matches that yet. Try another category or clear the search.</div>
   <div id="notice"></div>
+</section>
+
+<section class="wrap sec" id="personas">
+  <div class="sechead">
+    <h2>Shop by what you need</h2>
+  </div>
+  <div class="cats" id="personaGrid"></div>
 </section>
 
 <section class="wrap sec">
@@ -613,16 +609,6 @@ async function loadPersonas(){
 
 function escapeHtml(s){return String(s||"").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 
-function renderCats(){
-  const counts={};
-  PRODUCTS.forEach(p=>counts[p.cat]=(counts[p.cat]||0)+1);
-  const cats=Object.keys(counts).sort();
-  document.getElementById("catGrid").innerHTML = cats.map(c=>`
-    <button class="cat ${c===state.cat?'on':''}" onclick="setCat('${c.replace(/'/g,"\\'")}')">
-      <div><div class="cn">${escapeHtml(c)}</div><div class="cc">${counts[c]} item${counts[c]!==1?'s':''}</div></div>
-      <span class="go">Shop →</span>
-    </button>`).join("");
-}
 function renderChips(){
   document.getElementById("chips").innerHTML = CATS.map(c=>
     `<button class="chip ${c===state.cat?'on':''}" onclick="setCat('${c.replace(/'/g,"\\'")}')">${escapeHtml(c)}</button>`
@@ -668,7 +654,7 @@ function render(){
   document.getElementById("shopCount").textContent = shown.length+" item"+(shown.length!==1?"s":"");
   document.getElementById("grid").innerHTML = shown.map(cardHtml).join("");
   document.getElementById("empty").classList.toggle("hidden", shown.length>0);
-  renderCats(); renderChips(); renderBundle();
+  renderChips(); renderBundle();
 }
 
 function items(){return Object.entries(state.bundle).map(([id,qty])=>({p:PRODUCTS.find(x=>x.id===id),qty})).filter(x=>x.p);}
@@ -882,6 +868,30 @@ function renderPersonaHero(meta){
   }
 }
 
+// The homepage hero photo lives in the same personas table, at a
+// reserved key that never appears as a shoppable tile/collection (see
+// the bootstrap below, which splits it out of PERSONAS). Only its
+// hero_image_url is used — the headline/line here are fixed site copy,
+// not owner-editable text.
+const HOME_HERO_KEY="home-hero";
+function homeHeroImgError(img){
+  const hero=img.closest(".home-hero");
+  if(!hero)return;
+  const scrim=hero.querySelector(".scrim");
+  img.remove();
+  if(scrim) scrim.remove();
+  hero.classList.add("solid");
+}
+window.homeHeroImgError=homeHeroImgError;
+function renderHomeHero(meta){
+  const hero=document.getElementById("homeHero");
+  if(meta&&meta.heroImageUrl){
+    hero.insertAdjacentHTML("afterbegin",`<img src="${escapeHtml(meta.heroImageUrl)}" alt="" onerror="homeHeroImgError(this)"/><div class="scrim"></div>`);
+  }else{
+    hero.classList.add("solid");
+  }
+}
+
 function personaBundleMsg(items,meta){
   const lines=items.map(p=>`${p.name}${p.model?" ("+p.model+")":""} - ${naira(p.price)}`);
   const grandTotal=items.reduce((s,p)=>s+p.price,0);
@@ -969,10 +979,12 @@ function renderDetail(id){
 (async function(){
   const [{items:data,live,warn},personas]=await Promise.all([loadProducts(),loadPersonas()]);
   PRODUCTS=data;
-  PERSONAS=personas.sort((a,b)=>a.sortOrder-b.sortOrder);
+  const homeHeroMeta=personas.find(p=>p.key===HOME_HERO_KEY);
+  PERSONAS=personas.filter(p=>p.key!==HOME_HERO_KEY).sort((a,b)=>a.sortOrder-b.sortOrder);
   CATS=["All",...Array.from(new Set(PRODUCTS.map(p=>p.cat))).sort()];
   if(warn) document.getElementById("notice").innerHTML=`<div class="notice">${escapeHtml(warn)}</div>`;
   else if(!live&&!(CONFIG.supabase&&CONFIG.supabase.url)) document.getElementById("notice").innerHTML=`<div class="notice">Preview mode: showing built-in sample data. Add your Supabase config in CONFIG to go live.</div>`;
+  renderHomeHero(homeHeroMeta);
   renderPersonaTiles();
   renderBrandWall();
   // A shared ?p= link opens straight into the panel with nothing of ours
