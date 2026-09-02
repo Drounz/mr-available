@@ -616,17 +616,17 @@ function renderChips(){
 }
 function cardHtml(p){
   const n=state.bundle[p.id]||0;
+  const pid=p.id.replace(/'/g,"\\'");
   const thumb=p.image
     ? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" loading="lazy" onerror="this.outerHTML='${boxSVG.replace(/'/g,'&#39;')}'"/>`
     : boxSVG;
   const modelLine=p.model?`<div class="pmodel">Model <b>${escapeHtml(p.model)}</b></div>`:"";
   const ctrl=n>0
-    ? `<div class="stepper"><button onclick="dec('${p.id}')">−</button><span class="q">${n}</span><button onclick="add('${p.id}')">+</button></div>`
-    : `<button class="mini" onclick="add('${p.id}')">+ Add</button>`;
-  const pid=p.id.replace(/'/g,"\\'");
+    ? `<div class="stepper"><button onclick="dec('${pid}')">−</button><span class="q">${n}</span><button onclick="add('${pid}')">+</button></div>`
+    : `<button class="mini" onclick="add('${pid}')">+ Add</button>`;
   return `<article class="card">
     <div class="thumb" role="button" tabindex="0" style="cursor:pointer" onclick="goToProduct(event,'${pid}')" onkeydown="if(event.key==='Enter')goToProduct(event,'${pid}')">${thumb}<span class="cat-tag">${escapeHtml(p.cat)}</span>
-      <div class="addover"><button class="btn btn-dark" onclick="event.stopPropagation();add('${p.id}')">Add to bundle</button></div>
+      <div class="addover"><button class="btn btn-dark" onclick="event.stopPropagation();add('${pid}')">Add to bundle</button></div>
     </div>
     <div class="pbody">
       <a class="pname" href="?p=${encodeURIComponent(p.id)}" onclick="return goToProduct(event,'${pid}')">${escapeHtml(p.name)}</a>
@@ -675,13 +675,15 @@ function renderBundle(){
     body.innerHTML=`<div class="empty">Your bundle is empty. Add a few items and send them to us in one message.</div>`;
     document.getElementById("dfoot").classList.add("hidden");
   }else{
-    body.innerHTML=list.map(({p,qty})=>`
+    body.innerHTML=list.map(({p,qty})=>{
+      const pid=p.id.replace(/'/g,"\\'");
+      return `
       <div class="ditem">
         <div style="flex:1"><div class="dn">${escapeHtml(p.name)}</div>
         <div class="dp">${p.model?("Model "+escapeHtml(p.model)+" · "):""}${naira(p.price)} each</div></div>
-        <div class="stepper"><button onclick="dec('${p.id}')">−</button><span class="q">${qty}</span><button onclick="add('${p.id}')">+</button></div>
-        <button class="xbtn" style="height:28px;width:28px" onclick="removeItem('${p.id}')">✕</button>
-      </div>`).join("");
+        <div class="stepper"><button onclick="dec('${pid}')">−</button><span class="q">${qty}</span><button onclick="add('${pid}')">+</button></div>
+        <button class="xbtn" style="height:28px;width:28px" onclick="removeItem('${pid}')">✕</button>
+      </div>`;}).join("");
     document.getElementById("dfoot").classList.remove("hidden");
     document.getElementById("drawerTotal").textContent=naira(total());
     document.getElementById("sendBtn").href=bundleMsg();

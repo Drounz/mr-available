@@ -30,6 +30,22 @@ alter table products add column if not exists description text not null default 
 -- per-product in admin.html (yet).
 alter table products add column if not exists personas text[] not null default '{}';
 
+-- Sanity bounds on the columns the browser can write (see the update
+-- grant below). These don't require a login to bypass — anyone with
+-- the anon key can call the REST API directly, admin.html or not — so
+-- this is the real backstop against a stray/malicious write leaving
+-- garbage a normal UI never would: a negative price, or megabytes of
+-- text in a field meant for one line. Limits are generous on purpose;
+-- they should never fire on legitimate content.
+alter table products drop constraint if exists products_selling_price_nonneg;
+alter table products add constraint products_selling_price_nonneg check (selling_price >= 0);
+alter table products drop constraint if exists products_description_len;
+alter table products add constraint products_description_len check (char_length(description) <= 2000);
+alter table products drop constraint if exists products_image_url_len;
+alter table products add constraint products_image_url_len check (char_length(image_url) <= 2000);
+alter table products drop constraint if exists products_images_len;
+alter table products add constraint products_images_len check (array_length(images, 1) is null or array_length(images, 1) <= 20);
+
 alter table products enable row level security;
 
 -- Public storefront: anyone may READ products that are published.
@@ -91,6 +107,17 @@ create table if not exists personas (
   hero_image_url text not null default '',
   sort_order int not null default 0
 );
+
+-- Same reasoning as the products constraints above: generous bounds
+-- against a stray/malicious direct write, not against normal use.
+alter table personas drop constraint if exists personas_title_len;
+alter table personas add constraint personas_title_len check (char_length(title) <= 200);
+alter table personas drop constraint if exists personas_eyebrow_len;
+alter table personas add constraint personas_eyebrow_len check (char_length(eyebrow) <= 200);
+alter table personas drop constraint if exists personas_about_len;
+alter table personas add constraint personas_about_len check (char_length(about) <= 5000);
+alter table personas drop constraint if exists personas_hero_image_url_len;
+alter table personas add constraint personas_hero_image_url_len check (char_length(hero_image_url) <= 2000);
 
 alter table personas enable row level security;
 
