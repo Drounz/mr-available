@@ -120,6 +120,15 @@ grant update (title, eyebrow, about, hero_image_url) on personas to anon, authen
 -- created or deleted from the browser.
 revoke insert, delete on personas from anon, authenticated;
 
+-- The homepage hero photo lives in this same table, at a reserved key
+-- that the storefront never treats as a shoppable persona (index.html
+-- filters it out of the tile/collection list). Only hero_image_url is
+-- real content here — title/eyebrow/about are unused for this row, so
+-- this seeds a blank placeholder, not invented copy.
+insert into personas (key, title, eyebrow, about, hero_image_url, sort_order)
+values ('home-hero', '', '', '', '', -1)
+on conflict (key) do nothing;
+
 -- Product photos bucket: public read, uploads capped to images under 5MB.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('products', 'products', true, 5242880, array['image/jpeg','image/png','image/webp','image/gif'])
