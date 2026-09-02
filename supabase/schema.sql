@@ -227,3 +227,81 @@ create policy "Public delete site images"
   on storage.objects for delete
   to public
   using (bucket_id = 'site');
+
+-- Analytics: page views and product clicks, logged anonymously by the
+-- storefront itself (see logEvent() in index.html). No cookies, no
+-- visitor id, nothing that ties one visit to another — just an
+-- anonymous event per page view / product open. country/city come
+-- from a client-side IP-geolocation lookup (ipapi.co), best-effort:
+-- if it fails, the event is still logged with those fields null.
+create table if not exists analytics_events (
+  id bigint generated always as identity primary key,
+  event_type text not null,
+  path text not null default '',
+  product_id text,
+  referrer text not null default '',
+  country text,
+  city text,
+  created_at timestamptz not null default now()
+);
+
+alter table analytics_events drop constraint if exists analytics_events_type_check;
+alter table analytics_events add constraint analytics_events_type_check check (event_type in ('page_view', 'product_click'));
+alter table analytics_events drop constraint if exists analytics_events_path_len;
+alter table analytics_events add constraint analytics_events_path_len check (char_length(path) <= 500);
+alter table analytics_events drop constraint if exists analytics_events_product_id_len;
+alter table analytics_events add constraint analytics_events_product_id_len check (product_id is null or char_length(product_id) <= 100);
+alter table analytics_events drop constraint if exists analytics_events_referrer_len;
+alter table analytics_events add constraint analytics_events_referrer_len check (char_length(referrer) <= 500);
+alter table analytics_events drop constraint if exists analytics_events_country_len;
+alter table analytics_events add constraint analytics_events_country_len check (country is null or char_length(country) <= 100);
+alter table analytics_events drop constraint if exists analytics_events_city_len;
+alter table analytics_events add constraint analytics_events_city_len check (city is null or char_length(city) <= 100);
+
+alter table analytics_events enable row level security;
+
+-- Write-only from the browser, deliberately: anyone can log an event
+-- (same no-login model as the rest of the site), but nobody can read,
+-- change, or delete one through the public anon key. Analytics is more
+-- sensitive than the product catalog (it's your traffic and behavior
+-- data), so unlike products/personas there is no public SELECT policy
+-- here at all — you view it in the Supabase dashboard (Table Editor or
+-- SQL Editor) using your own real Supabase login, not through
+-- admin.html or the anon key. That's a separate, pre-existing account,
+-- not a new sign-in step added to this site.
+drop policy if exists "Public may log analytics events" on analytics_events;
+create policy "Public may log analytics events"
+  on analytics_events for insert
+  to anon, authenticated
+  with check (true);
+
+revoke all on analytics_events from anon, authenticated;
+grant insert on analytics_events to anon, authenticated;
+grant usage on sequence analytics_events_id_seq to anon, authenticated;
+
+-- Convenience views for the dashboard — same "no anon access" rule
+-- applies: these are never granted to anon/authenticated, so they're
+-- only reachable from the Supabase dashboard (Table Editor > Views,
+-- or SQL Editor), never from the public site.
+create or replace view analytics_summary as
+select
+  count(*) filter (where event_type = 'page_view') as total_page_views,
+  count(*) filter (where event_type = 'product_click') as total_product_clicks,
+  count(distinct country) filter (where country is not null) as countries_seen,
+  min(created_at) as first_event_at,
+  max(created_at) as last_event_at
+from analytics_events;
+
+create or replace view analytics_top_products as
+select product_id, count(*) as clicks
+from analytics_events
+where event_type = 'product_click' and product_id is not null
+group by product_id
+order by clicks desc;
+
+create or replace view analytics_by_country as
+select coalesce(country, 'Unknown') as country, count(*) as visits
+from analytics_events
+where event_type = 'page_view'
+group by coalesce(country, 'Unknown')
+order by visits desc;

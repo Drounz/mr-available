@@ -555,6 +555,39 @@ function sbClient(){
   catch(e){ return null; }
 }
 
+/* ============================================================
+   Analytics — anonymous page-view / product-click logging.
+   No cookies, no visitor id, nothing that links one visit to the
+   next. Write-only from here (see supabase/schema.sql): the owner
+   views results in the Supabase dashboard, not on this site.
+   ============================================================ */
+let ANALYTICS_GEO = null;
+async function loadGeo(){
+  try{
+    const res = await fetch("https://ipapi.co/json/");
+    if(!res.ok) return;
+    const data = await res.json();
+    ANALYTICS_GEO = { country: data.country_name || null, city: data.city || null };
+  }catch(e){ /* best-effort only — never blocks the storefront */ }
+}
+function logEvent(type, extra){
+  // A slow, unreachable, or unexpectedly-shaped client must never affect
+  // the storefront — catch both a rejected promise and a synchronous throw.
+  try{
+    const client = sbClient();
+    if(!client) return;
+    const row = {
+      event_type: type,
+      path: location.pathname + location.search,
+      product_id: (extra && extra.productId) || null,
+      referrer: document.referrer || "",
+      country: ANALYTICS_GEO ? ANALYTICS_GEO.country : null,
+      city: ANALYTICS_GEO ? ANALYTICS_GEO.city : null
+    };
+    Promise.resolve(client.from("analytics_events").insert(row)).then(()=>{}, ()=>{});
+  }catch(e){ /* best-effort only */ }
+}
+
 async function loadProducts(){
   const client = sbClient();
   if(client){
@@ -806,6 +839,7 @@ function route(){
     baseTitle=document.title;
     baseKey=newBaseKey;
     window.scrollTo(0,0);
+    logEvent("page_view");
   }
   if(pid) openPanelUI(pid); else closePanelUI();
 }
@@ -817,6 +851,7 @@ function openPanelUI(id){
   document.getElementById("productPanel").classList.add("open");
   document.getElementById("panelBackdrop").classList.add("open");
   document.body.style.overflow="hidden";
+  logEvent("product_click",{productId:id});
 }
 function closePanelUI(){
   document.getElementById("productPanel").classList.remove("open");
@@ -979,6 +1014,7 @@ function renderDetail(id){
 }
 
 (async function(){
+  loadGeo(); // best-effort, fire-and-forget — never delays the storefront
   const [{items:data,live,warn},personas]=await Promise.all([loadProducts(),loadPersonas()]);
   PRODUCTS=data;
   const homeHeroMeta=personas.find(p=>p.key===HOME_HERO_KEY);
