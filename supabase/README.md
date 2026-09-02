@@ -5,7 +5,7 @@ Your site reads products from Supabase (Postgres + Storage). Supabase's free tie
 Files (drop these into the repo):
 - `index.html` — the site, already wired for Supabase.
 - `admin.html` — private photo uploader (see section 4 below).
-- `supabase/schema.sql` — creates the `products` and `personas` tables, their security policies, and the `products`/`site` storage buckets.
+- `supabase/schema.sql` — creates the `products` and `personas` tables, the `analytics_events` table and its reporting views, their security policies, and the `products`/`site` storage buckets.
 - `supabase/seed/products.json` — your 50 products.
 - `supabase/seed/seed.js`, `supabase/seed/package.json` — one-time loader.
 
@@ -47,6 +47,15 @@ If your `products` table ever picked up rows keyed by an image filename instead 
 - **Tag a product to a persona** ("Shop by what you need" collections): not yet in `admin.html` — edit the `personas` array column on that product's row in the Table Editor (e.g. `{bachelor-pad}` or `{bachelor-pad,new-home}`). Valid keys are whatever's in the `personas` table's `key` column (seeded with `first-nest`, `bachelor-pad`, `her-space`, `new-home`, `shortlet-host`). Only tag products that are published with a real price.
 - **Edit a persona's hero image or copy** (title/eyebrow/about): use `admin.html`'s "Page images" section (see section 4). Editing the `personas` table by hand in the Table Editor works too.
 - **Change the homepage hero photo**: same "Page images" section, the row labeled "Homepage hero" (that's the `key = 'home-hero'` row) — upload replaces it immediately. Its title/eyebrow/about fields are unused; the homepage headline and line are fixed copy in `index.html`.
+
+## See your site visits and product clicks
+The site logs an anonymous event every time someone lands on a page or opens a product (see `analytics_events` in `supabase/schema.sql`) — no cookies, no visitor accounts, nothing that identifies a person, just a count with a rough country/city. This table is deliberately **not** readable through the public anon key (unlike `products`/`personas`) — traffic data is more sensitive than your catalogue, so you view it in the Supabase dashboard with your own login, not through `admin.html`:
+- **Table Editor > analytics_summary** — total page views, total product clicks, how many countries you've seen, and the first/last event timestamps.
+- **Table Editor > analytics_top_products** — every product id that's been opened, most-clicked first.
+- **Table Editor > analytics_by_country** — page views grouped by country (rows with no location resolve to "Unknown" — the geolocation lookup is best-effort and occasionally misses).
+- For a raw, filterable log (e.g. "show me today's events"), use **SQL Editor** and query `analytics_events` directly, e.g. `select * from analytics_events where created_at > now() - interval '1 day' order by created_at desc;`.
+
+Location comes from a free IP-lookup service (`ipapi.co`) called from the visitor's browser — it's best-effort and never blocks or slows down the site if it fails or is rate-limited; that visit is just logged without a country/city.
 
 ## Notes
 - Cost prices are intentionally NOT stored in this table — keep your cost and margin records in your central sheet. (Unlike Firestore, Postgres *can* protect single columns with different rules, so this is a choice for simplicity, not a technical limit.)
