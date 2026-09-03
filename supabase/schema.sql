@@ -10,10 +10,13 @@ create table if not exists products (
   model text not null default '',
   category text not null default 'Other',
   brand text not null default '',
-  selling_price numeric not null,
+  selling_price numeric not null default 0,
   image_url text not null default '',
   published boolean not null default false
 );
+
+-- For a project created before this default existed.
+alter table products alter column selling_price set default 0;
 
 -- Ordered list of public image URLs for a product; images[0] is the
 -- card/primary photo, the rest are the gallery. image_url is kept in
@@ -45,6 +48,16 @@ alter table products drop constraint if exists products_image_url_len;
 alter table products add constraint products_image_url_len check (char_length(image_url) <= 2000);
 alter table products drop constraint if exists products_images_len;
 alter table products add constraint products_images_len check (array_length(images, 1) is null or array_length(images, 1) <= 20);
+alter table products drop constraint if exists products_id_len;
+alter table products add constraint products_id_len check (char_length(id) between 1 and 64);
+alter table products drop constraint if exists products_name_len;
+alter table products add constraint products_name_len check (char_length(name) <= 300);
+alter table products drop constraint if exists products_category_len;
+alter table products add constraint products_category_len check (char_length(category) <= 100);
+alter table products drop constraint if exists products_brand_len;
+alter table products add constraint products_brand_len check (char_length(brand) <= 100);
+alter table products drop constraint if exists products_model_len;
+alter table products add constraint products_model_len check (char_length(model) <= 100);
 
 alter table products enable row level security;
 
@@ -68,13 +81,13 @@ create policy "Anyone may read all products"
 
 -- No login by deliberate choice: anyone with the admin.html link may
 -- write, but the column grant below is still the only thing stopping
--- them from touching anything else — name, category, brand, and id stay
--- out of reach from the browser no matter what. selling_price and
--- published ARE in this grant (admin.html has a price field and a
--- publish toggle), so anyone who gets hold of the admin.html link can
--- change a price or flip a product's visibility. Keep that link private.
--- No insert/delete policy exists, so creating or deleting products from
--- the browser is denied outright regardless of this grant.
+-- them from touching anything else — category, brand, model, and id can
+-- be set once at creation (see the insert grant below) but never changed
+-- afterward from the browser; only the Supabase dashboard can fix a typo
+-- in one of those. selling_price, published, and name ARE in this grant
+-- (admin.html has a price field, a publish toggle, and a name field), so
+-- anyone who gets hold of the admin.html link can change a price, rename
+-- a product, or flip its visibility. Keep that link private.
 drop policy if exists "Public may update image_url only" on products;
 drop policy if exists "Owner may update product photos" on products;
 drop policy if exists "Public may update product photos" on products;
@@ -85,14 +98,25 @@ create policy "Public may update product photos"
   with check (true);
 
 revoke update on products from anon, authenticated;
-grant update (images, image_url, description, selling_price, published) on products to anon, authenticated;
+grant update (images, image_url, description, selling_price, published, name) on products to anon, authenticated;
 
--- Non-negotiable: a product is a row created only from the catalogue
--- (Table Editor or the seed script's service-role key), never from an
--- uploaded image. No insert/delete policy exists for products, and
--- these explicit revokes make the browser's inability to create or
--- delete a product true at the grant level too, not just by omission.
+-- Creating a product from admin.html's "Add a product" form is a
+-- deliberate, explicit action now (id/name/category/brand/model only —
+-- selling_price defaults to 0 and published defaults to false, so a new
+-- product is never live until priced and published through the normal
+-- flow). This is different from the earlier, still-true rule that an
+-- *uploaded photo* never creates a product on its own (see uploadFiles()
+-- in admin.html, which still hard-requires an existing product). Delete
+-- is still denied outright — a product can be unpublished but never
+-- removed from the browser, signed in or not.
+drop policy if exists "Public may create products" on products;
+create policy "Public may create products"
+  on products for insert
+  to anon, authenticated
+  with check (true);
+
 revoke insert, delete on products from anon, authenticated;
+grant insert (id, name, category, brand, model) on products to anon, authenticated;
 
 -- Persona collections ("Shop by what you need"). Content (copy and hero
 -- images) is owner-managed data — the app only ever reads/writes rows
