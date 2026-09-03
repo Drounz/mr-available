@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>MR AVAILABLE — Photo uploader</title>
+<title>MR AVAILABLE — Admin</title>
 <meta name="robots" content="noindex, nofollow" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,109 +14,124 @@
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
   body{background:var(--paper);color:var(--ink);font-family:"Poppins",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
-  .wrap{max-width:820px;margin:0 auto;padding:40px 20px 80px}
-  h1{font-size:26px;font-weight:800;letter-spacing:-.02em;margin:0 0 6px}
-  h2{font-size:15px;font-weight:700;margin:0 0 10px}
-  .lead{color:var(--muted);font-size:14px;margin:0 0 24px;max-width:560px}
-  .card{background:var(--soft);border-radius:16px;padding:20px;margin-bottom:20px}
+  .wrap{max-width:820px;margin:0 auto;padding:32px 16px 80px}
+  h1{font-size:24px;font-weight:800;letter-spacing:-.02em;margin:0 0 6px}
+  h1 .dot{color:var(--accent)}
+  h2{font-size:15px;font-weight:700;margin:0}
+  .lead{color:var(--muted);font-size:13.5px;margin:0 0 20px;max-width:560px}
+  .card{background:var(--soft);border-radius:16px;padding:18px;margin-bottom:18px}
   .card p{font-size:13px;color:var(--muted);margin:0 0 10px}
+  .cardhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
   code{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:12.5px}
-  .search{width:100%;padding:10px 14px;border:1px solid var(--line);border-radius:999px;font-size:13.5px;font-family:inherit;margin-bottom:10px;background:#fff}
-  .plist{max-height:260px;overflow-y:auto;border:1px solid var(--line);border-radius:10px;background:#fff}
-  .prow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;border-bottom:1px solid var(--line);cursor:pointer;font-size:13px}
+  .hidden{display:none!important}
+
+  /* shared controls */
+  .btn{font-size:13px;font-weight:600;padding:11px 18px;min-height:44px;border-radius:999px;background:var(--ink);color:#fff;border:none;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+  .btn:active{opacity:.85}
+  .btn-ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  .btn-danger{background:#fff;color:var(--err);border:1px solid #F3C9C5;width:100%;margin-top:22px}
+  .btnrow{display:flex;gap:10px;margin-top:14px}
+  .btnrow .btn{flex:1}
+  input[type=text],input[type=number],input[type=email],textarea{width:100%;padding:10px 13px;border:1px solid var(--line);border-radius:10px;font-size:13.5px;font-family:inherit;background:#fff;min-height:44px}
+  textarea{min-height:72px;resize:vertical}
+  label{display:block;font-size:12.5px;font-weight:600;margin-bottom:6px}
+
+  /* search + filter chips */
+  .search{margin-bottom:12px}
+  .chips{display:flex;gap:8px;overflow-x:auto;margin-bottom:14px;padding-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{white-space:nowrap;font-size:12.5px;font-weight:600;padding:0 14px;min-height:44px;border-radius:999px;background:#fff;color:var(--ink);flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);cursor:pointer;font-family:inherit}
+  .chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .chip .cc{font-size:11px;opacity:.7}
+
+  /* add-product form */
+  .addform{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+  .addform label{margin-top:12px}
+  .addform label:first-child{margin-top:0}
+
+  /* product list */
+  .plist{background:#fff;border-radius:12px;overflow:hidden}
+  .prow{display:flex;align-items:center;gap:12px;padding:10px;border-bottom:1px solid var(--line);cursor:pointer;min-height:44px}
   .prow:last-child{border-bottom:none}
   .prow:hover{background:var(--soft)}
-  .prow.on{background:var(--ink);color:#fff}
-  .prow .pn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .prow .pf{font-size:11px;color:var(--muted);flex:0 0 auto}
-  .prow.on .pf{color:rgba(255,255,255,.7)}
-  .badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;background:#FFF7E6;color:#8A5A00}
-  .selected{border:1px solid var(--line);border-radius:16px;padding:20px;margin-top:20px}
-  .selected .sid{font-size:12px;color:var(--muted)}
-  .selected .sname{font-size:17px;font-weight:700;margin-top:2px}
-  .drop{border:2px dashed var(--line);border-radius:16px;padding:28px 20px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;margin-top:16px}
+  .pthumb{width:48px;height:48px;border-radius:9px;background:var(--soft);flex:0 0 auto;overflow:hidden;display:flex;align-items:center;justify-content:center}
+  .pthumb img{width:100%;height:100%;object-fit:cover}
+  .pinfo{flex:1;min-width:0}
+  .pname{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pmeta{font-size:11.5px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .stag{font-size:10px;font-weight:700;padding:5px 9px;border-radius:999px;flex:0 0 auto;white-space:nowrap;text-transform:uppercase;letter-spacing:.02em}
+  .stag.live{background:#E7F5EF;color:var(--price)}
+  .stag.hidden{background:var(--line);color:var(--muted)}
+  .stag.nophoto{background:#FFF7E6;color:#8A5A00}
+  .stag.price{background:#FBE7E5;color:var(--err)}
+
+  .loading,.emptystate{padding:26px 14px;text-align:center;color:var(--muted);font-size:13px}
+
+  /* photo drop + thumbs (editor) */
+  .drop{border:2px dashed var(--line);border-radius:16px;padding:24px 16px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;margin:16px 0}
   .drop.over{border-color:var(--accent);background:#FFF7E6}
   .drop input{display:none}
-  .drop .dt{font-weight:600;font-size:14px}
-  .drop .ds{font-size:12px;color:var(--muted);margin-top:4px}
-  .thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;margin-top:16px}
+  .drop .dt{font-weight:600;font-size:13.5px}
+  .drop .ds{font-size:11.5px;color:var(--muted);margin-top:4px}
+  .thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
   .thumb{position:relative;border-radius:10px;overflow:hidden;aspect-ratio:1/1;background:var(--soft)}
   .thumb img{width:100%;height:100%;object-fit:cover;display:block}
-  .thumb .primary{position:absolute;top:5px;left:5px;background:var(--accent);color:var(--ink);font-size:9px;font-weight:700;padding:2px 6px;border-radius:999px}
-  .thumb .tbtns{position:absolute;bottom:5px;right:5px;display:flex;gap:3px}
-  .thumb .tbtns button{height:22px;width:22px;border-radius:999px;background:rgba(20,33,58,.85);color:#fff;border:none;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-  .status{font-size:12.5px;margin-top:14px}
-  .status.ok{color:var(--ok)}
-  .status.err{color:var(--err)}
-  .hidden{display:none}
-  .descbox{margin-top:20px}
-  .descbox label{display:block;font-size:12.5px;font-weight:600;margin-bottom:6px}
-  .descbox textarea{width:100%;min-height:64px;padding:10px 13px;border:1px solid var(--line);border-radius:10px;font-size:13.5px;font-family:inherit;background:#fff;resize:vertical}
-  .descbox .btn{margin-top:8px;font-size:12.5px;font-weight:600;padding:8px 16px;border-radius:999px;background:var(--ink);color:#fff;border:none;cursor:pointer;font-family:inherit}
-  .descstatus{font-size:12px;margin-top:6px}
-  .descstatus.ok{color:var(--ok)}
-  .descstatus.err{color:var(--err)}
-  .pricebox{margin-top:20px}
-  .pricebox label{display:block;font-size:12.5px;font-weight:600;margin-bottom:6px}
-  .pricebox input{width:100%;padding:10px 13px;border:1px solid var(--line);border-radius:10px;font-size:13.5px;font-family:inherit;background:#fff}
-  .pricebox .btn{margin-top:8px;font-size:12.5px;font-weight:600;padding:8px 16px;border-radius:999px;background:var(--ink);color:#fff;border:none;cursor:pointer;font-family:inherit}
-  .pricestatus{font-size:12px;margin-top:6px}
-  .pricestatus.ok{color:var(--ok)}
-  .pricestatus.err{color:var(--err)}
-  .publishrow{margin-top:18px;display:flex;align-items:center;gap:10px}
-  .switch{position:relative;display:inline-block;width:40px;height:24px;flex:0 0 auto}
+  .thumb .cover{position:absolute;top:6px;left:6px;background:var(--accent);color:var(--ink);font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:999px}
+  .thumb .tbtns{position:absolute;bottom:6px;right:6px;display:flex;gap:4px}
+  .thumb .tbtns button{height:34px;width:34px;border-radius:999px;background:rgba(20,33,58,.88);color:#fff;border:none;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+  /* editor fields */
+  .fieldgrid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:18px}
+  @media(min-width:520px){.fieldgrid{grid-template-columns:1fr 1fr}}
+  .span2{grid-column:1/-1}
+  .publishrow{margin-top:20px;display:flex;align-items:center;gap:10px}
+  .switch{position:relative;display:inline-block;width:44px;height:26px;flex:0 0 auto}
   .switch input{opacity:0;width:0;height:0}
   .switch .slider{position:absolute;inset:0;background:var(--line);border-radius:999px;cursor:pointer;transition:background .15s}
-  .switch .slider::before{content:"";position:absolute;height:18px;width:18px;left:3px;top:3px;background:#fff;border-radius:999px;transition:transform .15s;box-shadow:0 1px 3px rgba(20,33,58,.3)}
+  .switch .slider::before{content:"";position:absolute;height:20px;width:20px;left:3px;top:3px;background:#fff;border-radius:999px;transition:transform .15s;box-shadow:0 1px 3px rgba(20,33,58,.3)}
   .switch input:checked + .slider{background:var(--price)}
-  .switch input:checked + .slider::before{transform:translateX(16px)}
+  .switch input:checked + .slider::before{transform:translateX(18px)}
   #publishedLabel{font-size:13px;font-weight:600}
+
+  /* editor overlay */
+  .ov-backdrop{position:fixed;inset:0;background:rgba(20,33,58,.5);z-index:40;opacity:0;pointer-events:none;transition:opacity .22s ease}
+  .ov-backdrop.open{opacity:1;pointer-events:auto}
+  .ov-panel{position:fixed;top:0;right:0;bottom:0;width:100%;max-width:480px;background:#fff;z-index:41;transform:translateX(100%);transition:transform .25s ease;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:-12px 0 30px rgba(20,33,58,.15)}
+  .ov-panel.open{transform:translateX(0)}
+  .ov-head{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;z-index:1}
+  .ov-back{font-size:13.5px;font-weight:600;color:var(--ink);min-height:44px;padding:0 8px;display:flex;align-items:center;gap:4px;background:none;border:none;cursor:pointer;font-family:inherit}
+  .ov-id{font-size:12px;color:var(--muted)}
+  .ov-body{padding:18px}
+
+  /* page images (personas) */
   .persona-row{border:1px solid var(--line);border-radius:14px;padding:16px;background:#fff;margin-bottom:14px}
   .persona-row:last-child{margin-bottom:0}
   .persona-row .prtitle{font-size:14px;font-weight:700;margin-bottom:10px}
   .persona-hero-preview{position:relative;border-radius:10px;overflow:hidden;aspect-ratio:16/7;background:var(--soft);display:flex;align-items:center;justify-content:center;margin-bottom:10px}
   .persona-hero-preview img{width:100%;height:100%;object-fit:cover}
   .persona-hero-preview .ph-empty{font-size:12px;color:var(--muted)}
-  .persona-row label{display:block;font-size:12px;font-weight:600;margin:10px 0 4px}
-  .persona-row input[type=text],.persona-row textarea{width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:10px;font-size:13px;font-family:inherit;background:#fff}
-  .persona-row textarea{min-height:56px;resize:vertical}
-  .persona-row .btn{margin-top:10px;margin-right:6px;font-size:12.5px;font-weight:600;padding:8px 16px;border-radius:999px;background:var(--ink);color:#fff;border:none;cursor:pointer;font-family:inherit}
-  .persona-status{font-size:12px;margin-top:8px}
-  .persona-status.ok{color:var(--ok)}
-  .persona-status.err{color:var(--err)}
-  .namebox{margin-top:20px}
-  .namebox label{display:block;font-size:12.5px;font-weight:600;margin-bottom:6px}
-  .namebox input{width:100%;padding:10px 13px;border:1px solid var(--line);border-radius:10px;font-size:13.5px;font-family:inherit;background:#fff}
-  .namebox .btn{margin-top:8px;font-size:12.5px;font-weight:600;padding:8px 16px;border-radius:999px;background:var(--ink);color:#fff;border:none;cursor:pointer;font-family:inherit}
-  .namestatus{font-size:12px;margin-top:6px}
-  .namestatus.ok{color:var(--ok)}
-  .namestatus.err{color:var(--err)}
-  .addbox label{display:block;font-size:12.5px;font-weight:600;margin:12px 0 6px}
-  .addbox label:first-child{margin-top:0}
-  .addbox input{width:100%;padding:10px 13px;border:1px solid var(--line);border-radius:10px;font-size:13.5px;font-family:inherit;background:#fff}
-  .addbox .btn{margin-top:14px;font-size:12.5px;font-weight:600;padding:8px 16px;border-radius:999px;background:var(--ink);color:#fff;border:none;cursor:pointer;font-family:inherit}
-  .addstatus{font-size:12px;margin-top:8px}
-  .addstatus.ok{color:var(--ok)}
-  .addstatus.err{color:var(--err)}
+  .persona-row label{margin:10px 0 6px}
+  .persona-row .btn{margin-top:10px;margin-right:8px}
+
+  /* toast */
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(16px);background:var(--ink);color:#fff;font-size:13px;font-weight:600;padding:12px 20px;border-radius:999px;box-shadow:0 8px 24px rgba(20,33,58,.28);z-index:60;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;max-width:88vw;text-align:center}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast.err{background:var(--err)}
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <h1>Photo uploader</h1>
-  <p class="lead">Manage product photos and page images here. This page is not linked from the storefront and does not require a login — keep the URL to yourself.</p>
+  <h1>Admin<span class="dot">.</span></h1>
+  <p class="lead">Manage products and page images here. This page is not linked from the storefront and does not require a login — keep the URL to yourself.</p>
 
   <div class="card">
-    <h2>Pick a product</h2>
-    <p>Search by name, brand, or ID, then click one to manage its photos.</p>
-    <input class="search" id="search" placeholder="Search products..." />
-    <div class="plist" id="plist"></div>
-  </div>
+    <div class="cardhead">
+      <h2>Products</h2>
+      <button class="btn" id="addToggleBtn">+ Add product</button>
+    </div>
 
-  <div class="card">
-    <h2>Add a product</h2>
-    <p>Creates a new, unpublished product with no photos or price yet — pick it from the list above afterward to finish setting it up.</p>
-    <div class="addbox">
+    <div class="addform hidden" id="addForm">
       <label for="addId">Product ID (code)</label>
       <input type="text" id="addId" placeholder="e.g. TV010" />
       <label for="addName">Name</label>
@@ -128,37 +143,48 @@
       <input type="text" id="addBrand" placeholder="e.g. Hisense" />
       <label for="addModel">Model (optional)</label>
       <input type="text" id="addModel" placeholder="e.g. 55A6K" />
-      <button class="btn" id="addSaveBtn">Create product</button>
-      <div class="addstatus hidden" id="addStatus"></div>
+      <div class="btnrow">
+        <button class="btn" id="addCreateBtn">Create</button>
+        <button class="btn btn-ghost" id="addCancelBtn">Cancel</button>
+      </div>
     </div>
+
+    <input class="search" id="search" placeholder="Search name, brand, or ID..." />
+    <div class="chips" id="filterChips"></div>
+    <div class="plist" id="plist"><div class="loading">Loading products…</div></div>
   </div>
 
-  <div class="selected hidden" id="selectedPanel">
-    <div class="sid" id="selId"></div>
-    <div class="sname" id="selName"></div>
+  <div class="card" id="pageImagesCard">
+    <h2 style="margin-bottom:12px">Page images</h2>
+    <p>Manage each collection's hero banner and copy. No login here either — keep this URL to yourself.</p>
+    <div id="personaList"><div class="loading">Loading collections…</div></div>
+  </div>
 
+</div>
+
+<div id="editorBackdrop" class="ov-backdrop hidden"></div>
+<div id="editorPanel" class="ov-panel hidden" role="dialog" aria-modal="true" aria-label="Edit product">
+  <div class="ov-head">
+    <button class="ov-back" id="editorCloseBtn">← Back</button>
+    <span class="ov-id" id="editorId"></span>
+  </div>
+  <div class="ov-body">
     <div class="thumbs" id="thumbs"></div>
-
-    <div class="namebox">
-      <label for="nameInput">Product name</label>
-      <input type="text" id="nameInput" placeholder="e.g. Smart TV 55&quot;" />
-      <button class="btn" id="nameSaveBtn">Save name</button>
-      <div class="namestatus hidden" id="nameStatus"></div>
+    <div class="drop" id="drop">
+      <input type="file" id="fileInput" accept="image/*" multiple />
+      <div class="dt">Click to add photos, or drag them here</div>
+      <div class="ds">JPG or PNG, up to 5MB each. Any filename works — drop several at once for a gallery.</div>
     </div>
 
-    <div class="descbox">
-      <label for="descInput">Short description (shows on the product page)</label>
-      <textarea id="descInput" placeholder="e.g. 1.5HP split inverter AC, quiet mode, remote included"></textarea>
-      <button class="btn" id="descSaveBtn">Save description</button>
-      <div class="descstatus hidden" id="descStatus"></div>
+    <div class="fieldgrid">
+      <div><label for="fName">Name</label><input type="text" id="fName" /></div>
+      <div><label for="fCategory">Category</label><input type="text" id="fCategory" list="categoryOptions" /></div>
+      <div><label for="fBrand">Brand</label><input type="text" id="fBrand" /></div>
+      <div><label for="fModel">Model</label><input type="text" id="fModel" /></div>
+      <div class="span2"><label for="fDesc">Short description (shows on the product page)</label><textarea id="fDesc" placeholder="e.g. 1.5HP split inverter AC, quiet mode, remote included"></textarea></div>
+      <div><label for="fPrice">Selling price (₦)</label><input type="number" id="fPrice" min="0" step="1" placeholder="e.g. 450000" /></div>
     </div>
-
-    <div class="pricebox">
-      <label for="priceInput">Selling price (₦)</label>
-      <input type="number" id="priceInput" min="0" step="1" placeholder="e.g. 450000" />
-      <button class="btn" id="priceSaveBtn">Save price</button>
-      <div class="pricestatus hidden" id="priceStatus"></div>
-    </div>
+    <button class="btn" id="saveDetailsBtn" style="margin-top:16px;width:100%">Save details</button>
 
     <div class="publishrow">
       <label class="switch">
@@ -168,21 +194,11 @@
       <span id="publishedLabel">Unpublished</span>
     </div>
 
-    <div class="drop" id="drop">
-      <input type="file" id="fileInput" accept="image/*" multiple />
-      <div class="dt">Click to add photos, or drag them here</div>
-      <div class="ds">JPG or PNG, up to 5MB each. Any filename works — drop several at once for a gallery.</div>
-    </div>
-    <div class="status hidden" id="uploadStatus"></div>
+    <button class="btn btn-danger" id="deleteBtn">Delete product</button>
   </div>
-
-  <div class="card" id="pageImagesCard">
-    <h2>Page images</h2>
-    <p>Manage each collection's hero banner and copy. No login here either — keep this URL to yourself.</p>
-    <div id="personaList"></div>
-  </div>
-
 </div>
+
+<div class="toast hidden" id="toast"></div>
 
 <script>
 const CONFIG = {
@@ -196,114 +212,181 @@ const client = supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKe
 
 function escapeHtml(s){return String(s||"").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 function naira(n){return "₦" + Number(n||0).toLocaleString("en-NG");}
+const boxSVG = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B4BCC7" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5V8Z"/><path d="M3 8l9 5 9-5"/><path d="M12 13v8"/></svg>';
 
-let PRODUCTS=[], currentId=null, currentImages=[];
+/* ============================================================
+   Shared toast — one consistent "Saved"/error confirmation used
+   by every action on this page (products, photos, page images).
+   ============================================================ */
+let toastTimer = null;
+function showToast(msg, kind){
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.className = "toast show" + (kind==="err" ? " err" : "");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>{ el.classList.remove("show"); }, kind==="err" ? 4000 : 2200);
+}
+
+let PRODUCTS=[], currentId=null, currentImages=[], listFilter="all", listQuery="";
 
 async function loadProducts(){
-  const { data, error } = await client.from("products").select("id,name,brand,category,published,selling_price,description").order("id");
-  if(error){ document.getElementById("plist").innerHTML = `<div class="prow" style="color:var(--err)">Could not load products.</div>`; return; }
+  const { data, error } = await client.from("products").select("id,name,brand,category,model,published,selling_price,description,images").order("name");
+  if(error){ document.getElementById("plist").innerHTML = `<div class="emptystate">Could not load products.</div>`; return; }
   PRODUCTS = data||[];
-  renderList("");
   renderCategoryOptions();
+  renderCatalogue();
 }
 function renderCategoryOptions(){
   const cats = Array.from(new Set(PRODUCTS.map(p=>p.category).filter(Boolean))).sort();
   document.getElementById("categoryOptions").innerHTML = cats.map(c=>`<option value="${escapeHtml(c)}"></option>`).join("");
 }
 
-function setAddStatus(msg, kind){
-  const el = document.getElementById("addStatus");
-  el.textContent = msg;
-  el.className = "addstatus" + (kind?(" "+kind):"") + (msg?"":" hidden");
-  if(!msg) el.classList.add("hidden");
+// Status shown per row — computed, not stored. Priority when more than
+// one applies: Set price > No photo > Hidden/Live, since a missing price
+// is the most blocking issue (the storefront won't show the product at
+// all, published or not) and a missing photo is the next most visible gap.
+function statusFor(p){
+  if(!p.selling_price || p.selling_price<=0) return {label:"Set price", cls:"price"};
+  if(!p.images || !p.images.length) return {label:"No photo", cls:"nophoto"};
+  return p.published ? {label:"Live", cls:"live"} : {label:"Hidden", cls:"hidden"};
 }
+function matchesFilter(p){
+  if(listFilter==="live") return !!p.published;
+  if(listFilter==="hidden") return !p.published;
+  if(listFilter==="nophoto") return !p.images || !p.images.length;
+  return true;
+}
+function renderFilterChips(){
+  const counts = {
+    all: PRODUCTS.length,
+    live: PRODUCTS.filter(p=>p.published).length,
+    hidden: PRODUCTS.filter(p=>!p.published).length,
+    nophoto: PRODUCTS.filter(p=>!p.images || !p.images.length).length
+  };
+  const defs = [["all","All"],["live","Live"],["hidden","Hidden"],["nophoto","No photo"]];
+  document.getElementById("filterChips").innerHTML = defs.map(([key,label])=>
+    `<button class="chip ${listFilter===key?'on':''}" onclick="setListFilter('${key}')">${label} <span class="cc">${counts[key]}</span></button>`
+  ).join("");
+}
+function setListFilter(f){ listFilter = f; renderCatalogue(); }
+window.setListFilter = setListFilter;
+
+function renderCatalogue(){
+  renderFilterChips();
+  const list = document.getElementById("plist");
+  if(!PRODUCTS.length){ list.innerHTML = `<div class="emptystate">No products yet — add your first one above.</div>`; return; }
+  const q = listQuery.trim().toLowerCase();
+  const shown = PRODUCTS.filter(p=>matchesFilter(p) && (!q || (p.id+" "+p.name+" "+p.brand).toLowerCase().includes(q)));
+  if(!shown.length){ list.innerHTML = `<div class="emptystate">Nothing matches that search or filter.</div>`; return; }
+  list.innerHTML = shown.map(p=>{
+    const st = statusFor(p);
+    const pid = p.id.replace(/'/g,"\\'");
+    const thumb = (p.images && p.images[0]) ? `<img src="${escapeHtml(p.images[0])}" loading="lazy" alt=""/>` : boxSVG;
+    return `<div class="prow" role="button" tabindex="0" onclick="openEditor('${pid}')" onkeydown="if(event.key==='Enter')openEditor('${pid}')">
+      <div class="pthumb">${thumb}</div>
+      <div class="pinfo">
+        <div class="pname">${escapeHtml(p.name)}</div>
+        <div class="pmeta">${escapeHtml(p.brand)} · ${naira(p.selling_price)}</div>
+      </div>
+      <span class="stag ${st.cls}">${st.label}</span>
+    </div>`;
+  }).join("");
+}
+document.getElementById("search").addEventListener("input", e=>{ listQuery = e.target.value; renderCatalogue(); });
+
+/* ---- Add a product ---- */
+document.getElementById("addToggleBtn").addEventListener("click", ()=>{
+  document.getElementById("addForm").classList.toggle("hidden");
+});
+function clearAddForm(){
+  ["addId","addName","addCategory","addBrand","addModel"].forEach(id=>document.getElementById(id).value="");
+}
+document.getElementById("addCancelBtn").addEventListener("click", ()=>{
+  document.getElementById("addForm").classList.add("hidden");
+  clearAddForm();
+});
 async function createProduct(){
   const id = document.getElementById("addId").value.trim();
   const name = document.getElementById("addName").value.trim();
   const category = document.getElementById("addCategory").value.trim();
   const brand = document.getElementById("addBrand").value.trim();
   const model = document.getElementById("addModel").value.trim();
-  if(!id || !name){ setAddStatus("Product ID and name are required.", "err"); return; }
-  if(PRODUCTS.some(p=>p.id===id)){ setAddStatus(`"${id}" already exists — pick it from the list above instead.`, "err"); return; }
-  setAddStatus("Creating...", "");
+  if(!id || !name){ showToast("Product ID and name are required.", "err"); return; }
+  if(PRODUCTS.some(p=>p.id===id)){ showToast(`"${id}" already exists.`, "err"); return; }
   const row = { id, name, category: category || "Other", brand, model };
-  const { data, error } = await client.from("products").insert(row).select("id,name,brand,category,published,selling_price,description");
-  if(error){ setAddStatus("Could not create: " + error.message, "err"); return; }
+  const { data, error } = await client.from("products").insert(row).select("id,name,brand,category,model,published,selling_price,description,images");
+  if(error){ showToast("Could not create: " + error.message, "err"); return; }
   const created = data && data[0];
-  if(!created){ setAddStatus("Could not create: no row returned.", "err"); return; }
+  if(!created){ showToast("Could not create: no row returned.", "err"); return; }
   PRODUCTS.push(created);
   renderCategoryOptions();
-  document.getElementById("addId").value = "";
-  document.getElementById("addName").value = "";
-  document.getElementById("addCategory").value = "";
-  document.getElementById("addBrand").value = "";
-  document.getElementById("addModel").value = "";
-  setAddStatus("Created — opening it below.", "ok");
-  renderList(document.getElementById("search").value);
-  await selectProduct(created.id);
+  clearAddForm();
+  document.getElementById("addForm").classList.add("hidden");
+  renderCatalogue();
+  showToast("Created.");
+  openEditor(created.id);
 }
-document.getElementById("addSaveBtn").addEventListener("click", createProduct);
-function renderList(q){
-  const query = q.trim().toLowerCase();
-  const shown = PRODUCTS.filter(p=>!query || (p.id+" "+p.name+" "+p.brand).toLowerCase().includes(query));
-  document.getElementById("plist").innerHTML = shown.map(p=>`
-    <div class="prow ${p.id===currentId?'on':''}" onclick="selectProduct('${p.id.replace(/'/g,"\\'")}')">
-      <span class="pn"><code>${escapeHtml(p.id)}</code> — ${escapeHtml(p.brand)} ${escapeHtml(p.name)}</span>
-      <span class="pf">${p.published?naira(p.selling_price):'<span class="badge">unpublished</span>'}</span>
-    </div>`).join("") || `<div class="prow">No match.</div>`;
-}
-document.getElementById("search").addEventListener("input", e=>renderList(e.target.value));
+document.getElementById("addCreateBtn").addEventListener("click", createProduct);
 
-async function selectProduct(id){
-  currentId = id;
-  const p = PRODUCTS.find(x=>x.id===id);
-  document.getElementById("selectedPanel").classList.remove("hidden");
-  document.getElementById("selId").innerHTML = `<code>${escapeHtml(id)}</code>`;
-  document.getElementById("selName").textContent = p ? `${p.brand} ${p.name}` : id;
-  document.getElementById("nameInput").value = p ? (p.name||"") : "";
-  document.getElementById("descInput").value = p ? (p.description||"") : "";
-  document.getElementById("priceInput").value = p && p.selling_price ? p.selling_price : "";
-  document.getElementById("publishedToggle").checked = !!(p && p.published);
-  setPublishedLabel(!!(p && p.published));
-  setNameStatus("", "");
-  setDescStatus("", "");
-  setPriceStatus("", "");
-  setStatus("", "");
-  renderList(document.getElementById("search").value);
-  await refreshImages(id, {persist:false});
-}
-window.selectProduct = selectProduct;
-
+/* ---- Editor panel ---- */
 function setPublishedLabel(published){
   document.getElementById("publishedLabel").textContent = published ? "Published" : "Unpublished";
 }
+function openEditor(id){
+  currentId = id;
+  const p = PRODUCTS.find(x=>x.id===id);
+  if(!p) return;
+  document.getElementById("editorId").innerHTML = `<code>${escapeHtml(id)}</code>`;
+  document.getElementById("fName").value = p.name || "";
+  document.getElementById("fCategory").value = p.category || "";
+  document.getElementById("fBrand").value = p.brand || "";
+  document.getElementById("fModel").value = p.model || "";
+  document.getElementById("fDesc").value = p.description || "";
+  document.getElementById("fPrice").value = p.selling_price ? p.selling_price : "";
+  document.getElementById("publishedToggle").checked = !!p.published;
+  setPublishedLabel(!!p.published);
+  document.getElementById("editorBackdrop").classList.remove("hidden");
+  document.getElementById("editorPanel").classList.remove("hidden");
+  requestAnimationFrame(()=>{
+    document.getElementById("editorBackdrop").classList.add("open");
+    document.getElementById("editorPanel").classList.add("open");
+  });
+  refreshImages(id, {persist:false});
+}
+window.openEditor = openEditor;
+function closeEditor(){
+  document.getElementById("editorBackdrop").classList.remove("open");
+  document.getElementById("editorPanel").classList.remove("open");
+  setTimeout(()=>{
+    document.getElementById("editorBackdrop").classList.add("hidden");
+    document.getElementById("editorPanel").classList.add("hidden");
+  }, 250);
+}
+document.getElementById("editorCloseBtn").addEventListener("click", closeEditor);
+document.getElementById("editorBackdrop").addEventListener("click", closeEditor);
 
-function setPriceStatus(msg, kind){
-  const el = document.getElementById("priceStatus");
-  el.textContent = msg;
-  el.className = "pricestatus" + (kind?(" "+kind):"") + (msg?"":" hidden");
-  if(!msg) el.classList.add("hidden");
-}
-async function savePrice(){
-  if(!currentId || !PRODUCTS.some(p=>p.id===currentId)){
-    setPriceStatus("Pick a product from the list above first.", "err");
-    return;
-  }
-  const raw = document.getElementById("priceInput").value;
-  const value = Number(raw);
-  if(raw==="" || !Number.isFinite(value) || value<0){
-    setPriceStatus("Enter a valid price.", "err");
-    return;
-  }
-  const { data, error } = await client.from("products").update({ selling_price: value }).eq("id", currentId).select("id");
-  if(error){ setPriceStatus("Could not save: " + error.message, "err"); return; }
-  if(!data || !data.length){ setPriceStatus(`No product with ID "${currentId}" exists.`, "err"); return; }
+async function saveDetails(){
+  if(!currentId || !PRODUCTS.some(p=>p.id===currentId)) return;
+  const name = document.getElementById("fName").value.trim();
+  const category = document.getElementById("fCategory").value.trim();
+  const brand = document.getElementById("fBrand").value.trim();
+  const model = document.getElementById("fModel").value.trim();
+  const description = document.getElementById("fDesc").value.trim();
+  const rawPrice = document.getElementById("fPrice").value;
+  const price = Number(rawPrice);
+  if(!name){ showToast("Name can't be empty.", "err"); return; }
+  if(rawPrice==="" || !Number.isFinite(price) || price<0){ showToast("Enter a valid price.", "err"); return; }
+  const patch = { name, category: category || "Other", brand, model, description, selling_price: price };
+  const { data, error } = await client.from("products").update(patch).eq("id", currentId).select("id");
+  if(error){ showToast("Could not save: " + error.message, "err"); return; }
+  if(!data || !data.length){ showToast(`No product with ID "${currentId}" exists.`, "err"); return; }
   const p = PRODUCTS.find(x=>x.id===currentId);
-  if(p) p.selling_price = value;
-  renderList(document.getElementById("search").value);
-  setPriceStatus("Saved.", "ok");
+  if(p) Object.assign(p, patch);
+  renderCategoryOptions();
+  renderCatalogue();
+  showToast("Saved.");
 }
-document.getElementById("priceSaveBtn").addEventListener("click", savePrice);
+document.getElementById("saveDetailsBtn").addEventListener("click", saveDetails);
 
 async function togglePublished(){
   const toggle = document.getElementById("publishedToggle");
@@ -315,68 +398,39 @@ async function togglePublished(){
   const current = PRODUCTS.find(x=>x.id===currentId);
   if(value && (!current || !current.selling_price)){
     toggle.checked = false;
-    alert("Set and save a selling price before publishing — the storefront hides any product priced at ₦0.");
+    showToast("Set and save a selling price before publishing.", "err");
     return;
   }
   const { data, error } = await client.from("products").update({ published: value }).eq("id", currentId).select("id");
-  if(error){ toggle.checked = !value; alert("Could not save: " + error.message); return; }
-  if(!data || !data.length){ toggle.checked = !value; alert(`No product with ID "${currentId}" exists.`); return; }
+  if(error){ toggle.checked = !value; showToast("Could not save: " + error.message, "err"); return; }
+  if(!data || !data.length){ toggle.checked = !value; showToast(`No product with ID "${currentId}" exists.`, "err"); return; }
   const p = PRODUCTS.find(x=>x.id===currentId);
   if(p) p.published = value;
   setPublishedLabel(value);
-  renderList(document.getElementById("search").value);
+  renderCatalogue();
+  showToast(value ? "Published." : "Hidden.");
 }
 document.getElementById("publishedToggle").addEventListener("change", togglePublished);
 
-function setNameStatus(msg, kind){
-  const el = document.getElementById("nameStatus");
-  el.textContent = msg;
-  el.className = "namestatus" + (kind?(" "+kind):"") + (msg?"":" hidden");
-  if(!msg) el.classList.add("hidden");
+async function deleteProduct(){
+  if(!currentId) return;
+  if(!confirm(`Delete ${currentId} permanently?`)) return;
+  const { data: files } = await client.storage.from("products").list(currentId, { limit: 200 });
+  const paths = (files||[]).filter(f=>f.name && !f.name.startsWith(".")).map(f=>`${currentId}/${f.name}`);
+  if(paths.length) await client.storage.from("products").remove(paths);
+  const { error } = await client.from("products").delete().eq("id", currentId);
+  if(error){ showToast("Could not delete: " + error.message, "err"); return; }
+  PRODUCTS = PRODUCTS.filter(p=>p.id!==currentId);
+  closeEditor();
+  renderCatalogue();
+  showToast("Deleted.");
 }
-async function saveName(){
-  if(!currentId || !PRODUCTS.some(p=>p.id===currentId)){
-    setNameStatus("Pick a product from the list above first.", "err");
-    return;
-  }
-  const value = document.getElementById("nameInput").value.trim();
-  if(!value){ setNameStatus("Name can't be empty.", "err"); return; }
-  const { data, error } = await client.from("products").update({ name: value }).eq("id", currentId).select("id");
-  if(error){ setNameStatus("Could not save: " + error.message, "err"); return; }
-  if(!data || !data.length){ setNameStatus(`No product with ID "${currentId}" exists.`, "err"); return; }
-  const p = PRODUCTS.find(x=>x.id===currentId);
-  if(p) p.name = value;
-  document.getElementById("selName").textContent = p ? `${p.brand} ${p.name}` : currentId;
-  renderList(document.getElementById("search").value);
-  setNameStatus("Saved.", "ok");
-}
-document.getElementById("nameSaveBtn").addEventListener("click", saveName);
+document.getElementById("deleteBtn").addEventListener("click", deleteProduct);
 
-function setDescStatus(msg, kind){
-  const el = document.getElementById("descStatus");
-  el.textContent = msg;
-  el.className = "descstatus" + (kind?(" "+kind):"") + (msg?"":" hidden");
-  if(!msg) el.classList.add("hidden");
-}
-async function saveDescription(){
-  if(!currentId || !PRODUCTS.some(p=>p.id===currentId)){
-    setDescStatus("Pick a product from the list above first.", "err");
-    return;
-  }
-  const value = document.getElementById("descInput").value.trim();
-  const { data, error } = await client.from("products").update({ description: value }).eq("id", currentId).select("id");
-  if(error){ setDescStatus("Could not save: " + error.message, "err"); return; }
-  if(!data || !data.length){ setDescStatus(`No product with ID "${currentId}" exists.`, "err"); return; }
-  const p = PRODUCTS.find(x=>x.id===currentId);
-  if(p) p.description = value;
-  setDescStatus("Saved.", "ok");
-}
-document.getElementById("descSaveBtn").addEventListener("click", saveDescription);
-
+/* ---- Photos ---- */
 function publicUrlFor(path){
   return client.storage.from("products").getPublicUrl(path).data.publicUrl;
 }
-
 async function refreshImages(id, opts){
   const { data, error } = await client.storage.from("products").list(id, { limit: 200, sortBy: { column: "name", order: "asc" } });
   if(error){ currentImages = []; renderThumbs(); return; }
@@ -385,19 +439,20 @@ async function refreshImages(id, opts){
   renderThumbs();
   if(!opts || opts.persist!==false) await saveImages(id, currentImages);
 }
-
 async function saveImages(id, urls){
   const { data, error } = await client.from("products").update({ images: urls, image_url: urls[0]||"" }).eq("id", id).select("id");
-  if(error){ setStatus("Could not save: " + error.message, "err"); return false; }
-  if(!data || !data.length){ setStatus(`No product with ID "${id}" exists.`, "err"); return false; }
+  if(error){ showToast("Could not save: " + error.message, "err"); return false; }
+  if(!data || !data.length){ showToast(`No product with ID "${id}" exists.`, "err"); return false; }
+  const p = PRODUCTS.find(x=>x.id===id);
+  if(p) p.images = urls;
+  renderCatalogue();
   return true;
 }
-
 function renderThumbs(){
   document.getElementById("thumbs").innerHTML = currentImages.map((url,i)=>`
     <div class="thumb">
       <img src="${escapeHtml(url)}" loading="lazy" />
-      ${i===0?'<span class="primary">Primary</span>':''}
+      ${i===0?'<span class="cover">Cover</span>':''}
       <div class="tbtns">
         ${i>0?`<button title="Move earlier" onclick="moveImage(${i},-1)">‹</button>`:''}
         ${i<currentImages.length-1?`<button title="Move later" onclick="moveImage(${i},1)">›</button>`:''}
@@ -405,7 +460,6 @@ function renderThumbs(){
       </div>
     </div>`).join("");
 }
-
 async function moveImage(i, dir){
   const j = i+dir;
   if(j<0 || j>=currentImages.length) return;
@@ -414,19 +468,17 @@ async function moveImage(i, dir){
   await saveImages(currentId, currentImages);
 }
 window.moveImage = moveImage;
-
 function pathFromPublicUrl(url){
   const marker = "/storage/v1/object/public/products/";
   const idx = url.indexOf(marker);
   return idx===-1 ? null : url.slice(idx+marker.length);
 }
-
 async function deleteImage(i){
   const url = currentImages[i];
   const path = pathFromPublicUrl(url);
   if(path){
     const { error } = await client.storage.from("products").remove([path]);
-    if(error){ setStatus("Could not delete file: " + error.message, "err"); return; }
+    if(error){ showToast("Could not delete file: " + error.message, "err"); return; }
   }
   currentImages.splice(i,1);
   renderThumbs();
@@ -434,32 +486,24 @@ async function deleteImage(i){
 }
 window.deleteImage = deleteImage;
 
-function setStatus(msg, kind){
-  const el = document.getElementById("uploadStatus");
-  el.textContent = msg;
-  el.className = "status" + (kind?(" "+kind):"") + (msg?"":" hidden");
-  if(!msg) el.classList.add("hidden");
-}
-
 async function uploadFiles(files){
   // Non-negotiable: photos only ever attach to a product that already
   // exists in the loaded catalogue. No selected (and real) product, no
   // upload — this never creates a product, only appends to its images.
   if(!currentId || !PRODUCTS.some(p=>p.id===currentId)){
-    setStatus("Pick a product from the list above before uploading.", "err");
+    showToast("Pick a product first.", "err");
     return;
   }
-  setStatus(`Uploading ${files.length} photo${files.length!==1?'s':''}...`, "");
+  showToast(`Uploading ${files.length} photo${files.length!==1?'s':''}…`);
   for(const file of files){
     const ext = (file.name.match(/\.([^.]+)$/) || [,"jpg"])[1].toLowerCase();
     const name = `${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`;
     const { error } = await client.storage.from("products").upload(`${currentId}/${name}`, file, { contentType: file.type || "image/jpeg" });
-    if(error){ setStatus("Upload failed: " + error.message, "err"); return; }
+    if(error){ showToast("Upload failed: " + error.message, "err"); return; }
   }
   await refreshImages(currentId);
-  setStatus(`Done — ${files.length} photo${files.length!==1?'s':''} added.`, "ok");
+  showToast(`Added ${files.length} photo${files.length!==1?'s':''}.`);
 }
-
 const drop = document.getElementById("drop");
 const fileInput = document.getElementById("fileInput");
 drop.addEventListener("click", ()=>fileInput.click());
@@ -472,15 +516,15 @@ loadProducts();
 
 /* ============================================================
    Page images (persona hero banners + copy). No login, same as
-   the product section above — RLS on personas/site now grants
-   anon write too (see supabase/schema.sql), matching the rest of
-   this page's security model: open by design, URL kept private.
+   the product section above — RLS on personas/site grants anon
+   write too (see supabase/schema.sql), matching this page's
+   security model: open by design, URL kept private.
    ============================================================ */
 let PERSONAS_ADMIN = [];
 
 async function loadPersonasAdmin(){
   const { data, error } = await client.from("personas").select("*").order("sort_order");
-  if(error){ document.getElementById("personaList").innerHTML = `<div class="status err">Could not load: ${escapeHtml(error.message)}</div>`; return; }
+  if(error){ document.getElementById("personaList").innerHTML = `<div class="emptystate">Could not load: ${escapeHtml(error.message)}</div>`; return; }
   PERSONAS_ADMIN = data || [];
   renderPersonaList();
 }
@@ -502,8 +546,7 @@ function renderPersonaList(){
       <label>About</label>
       <textarea class="persona-about">${escapeHtml(p.about||"")}</textarea>
       <button class="btn persona-save-btn" type="button">Save text</button>
-      <div class="persona-status hidden"></div>
-    </div>`).join("") || `<div class="status">No persona rows found.</div>`;
+    </div>`).join("") || `<div class="emptystate">No persona rows found.</div>`;
 
   document.querySelectorAll(".persona-row").forEach(row=>{
     const key = row.dataset.key;
@@ -517,27 +560,20 @@ function renderPersonaList(){
   });
 }
 
-function setPersonaRowStatus(row, msg, kind){
-  const el = row.querySelector(".persona-status");
-  el.textContent = msg;
-  el.className = "persona-status" + (kind?(" "+kind):"") + (msg?"":" hidden");
-  if(!msg) el.classList.add("hidden");
-}
-
 async function uploadPersonaHero(key, file, row){
-  setPersonaRowStatus(row, "Uploading...", "");
+  showToast("Uploading…");
   const ext = (file.name.match(/\.([^.]+)$/) || [,"jpg"])[1].toLowerCase();
   const path = key === "home-hero" ? `home-hero.${ext}` : `personas/${key}.${ext}`;
   const { error: upErr } = await client.storage.from("site").upload(path, file, { upsert: true, contentType: file.type || "image/jpeg" });
-  if(upErr){ setPersonaRowStatus(row, "Upload failed: " + upErr.message, "err"); return; }
+  if(upErr){ showToast("Upload failed: " + upErr.message, "err"); return; }
   const url = client.storage.from("site").getPublicUrl(path).data.publicUrl;
   const { data, error } = await client.from("personas").update({ hero_image_url: url }).eq("key", key).select("key");
-  if(error){ setPersonaRowStatus(row, "Could not save: " + error.message, "err"); return; }
-  if(!data || !data.length){ setPersonaRowStatus(row, `No persona with key "${key}" exists.`, "err"); return; }
+  if(error){ showToast("Could not save: " + error.message, "err"); return; }
+  if(!data || !data.length){ showToast(`No persona with key "${key}" exists.`, "err"); return; }
   const p = PERSONAS_ADMIN.find(x=>x.key===key);
   if(p) p.hero_image_url = url;
   row.querySelector(".persona-hero-preview").innerHTML = `<img src="${escapeHtml(url)}?v=${Date.now()}" alt=""/>`;
-  setPersonaRowStatus(row, "Saved.", "ok");
+  showToast("Saved.");
 }
 
 async function savePersonaText(key, row){
@@ -545,11 +581,11 @@ async function savePersonaText(key, row){
   const title = row.querySelector(".persona-title").value.trim();
   const about = row.querySelector(".persona-about").value.trim();
   const { data, error } = await client.from("personas").update({ eyebrow, title, about }).eq("key", key).select("key");
-  if(error){ setPersonaRowStatus(row, "Could not save: " + error.message, "err"); return; }
-  if(!data || !data.length){ setPersonaRowStatus(row, `No persona with key "${key}" exists.`, "err"); return; }
+  if(error){ showToast("Could not save: " + error.message, "err"); return; }
+  if(!data || !data.length){ showToast(`No persona with key "${key}" exists.`, "err"); return; }
   const p = PERSONAS_ADMIN.find(x=>x.key===key);
   if(p){ p.eyebrow=eyebrow; p.title=title; p.about=about; }
-  setPersonaRowStatus(row, "Saved.", "ok");
+  showToast("Saved.");
 }
 
 loadPersonasAdmin();

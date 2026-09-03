@@ -81,13 +81,14 @@ create policy "Anyone may read all products"
 
 -- No login by deliberate choice: anyone with the admin.html link may
 -- write, but the column grant below is still the only thing stopping
--- them from touching anything else — category, brand, model, and id can
--- be set once at creation (see the insert grant below) but never changed
--- afterward from the browser; only the Supabase dashboard can fix a typo
--- in one of those. selling_price, published, and name ARE in this grant
--- (admin.html has a price field, a publish toggle, and a name field), so
--- anyone who gets hold of the admin.html link can change a price, rename
--- a product, or flip its visibility. Keep that link private.
+-- them from touching anything else — the id can only be set once at
+-- creation (see the insert grant below) and never changed afterward from
+-- the browser. category, brand, and model used to be creation-only too,
+-- but admin.html's editor now lets the owner fix a typo in any of them
+-- after the fact, so they're in this grant alongside selling_price,
+-- published, name, and description. Anyone who gets hold of the
+-- admin.html link can change any of these on any product. Keep that
+-- link private.
 drop policy if exists "Public may update image_url only" on products;
 drop policy if exists "Owner may update product photos" on products;
 drop policy if exists "Public may update product photos" on products;
@@ -98,25 +99,37 @@ create policy "Public may update product photos"
   with check (true);
 
 revoke update on products from anon, authenticated;
-grant update (images, image_url, description, selling_price, published, name) on products to anon, authenticated;
+grant update (images, image_url, description, selling_price, published, name, category, brand, model) on products to anon, authenticated;
 
 -- Creating a product from admin.html's "Add a product" form is a
--- deliberate, explicit action now (id/name/category/brand/model only —
+-- deliberate, explicit action (id/name/category/brand/model only —
 -- selling_price defaults to 0 and published defaults to false, so a new
 -- product is never live until priced and published through the normal
 -- flow). This is different from the earlier, still-true rule that an
 -- *uploaded photo* never creates a product on its own (see uploadFiles()
--- in admin.html, which still hard-requires an existing product). Delete
--- is still denied outright — a product can be unpublished but never
--- removed from the browser, signed in or not.
+-- in admin.html, which still hard-requires an existing product).
 drop policy if exists "Public may create products" on products;
 create policy "Public may create products"
   on products for insert
   to anon, authenticated
   with check (true);
 
-revoke insert, delete on products from anon, authenticated;
+revoke insert on products from anon, authenticated;
 grant insert (id, name, category, brand, model) on products to anon, authenticated;
+
+-- Delete is now allowed from admin.html's "Delete product" button (with
+-- a confirm step in the UI) — the owner removing a discontinued or
+-- mistakenly-created product used to have no path except the dashboard.
+-- Same no-login model as every other write here: anyone with the link
+-- can delete a row, so keep it private. admin.html clears that product's
+-- Storage folder first, then deletes the row.
+drop policy if exists "Public may delete products" on products;
+create policy "Public may delete products"
+  on products for delete
+  to anon, authenticated
+  using (true);
+
+grant delete on products to anon, authenticated;
 
 -- Persona collections ("Shop by what you need"). Content (copy and hero
 -- images) is owner-managed data — the app only ever reads/writes rows
