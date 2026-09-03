@@ -1,4 +1,13 @@
 {
+  "functions": {
+    "api/render.js": {
+      "includeFiles": "index.html"
+    }
+  },
+  "rewrites": [
+    { "source": "/", "destination": "/api/render" },
+    { "source": "/index.html", "destination": "/api/render" }
+  ],
   "headers": [
     {
       "source": "/(.*)",
