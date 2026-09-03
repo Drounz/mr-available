@@ -84,6 +84,20 @@
   .persona-status{font-size:12px;margin-top:8px}
   .persona-status.ok{color:var(--ok)}
   .persona-status.err{color:var(--err)}
+  .namebox{margin-top:20px}
+  .namebox label{display:block;font-size:12.5px;font-weight:600;margin-bottom:6px}
+  .namebox input{width:100%;padding:10px 13px;border:1px solid var(--line);border-radius:10px;font-size:13.5px;font-family:inherit;background:#fff}
+  .namebox .btn{margin-top:8px;font-size:12.5px;font-weight:600;padding:8px 16px;border-radius:999px;background:var(--ink);color:#fff;border:none;cursor:pointer;font-family:inherit}
+  .namestatus{font-size:12px;margin-top:6px}
+  .namestatus.ok{color:var(--ok)}
+  .namestatus.err{color:var(--err)}
+  .addbox label{display:block;font-size:12.5px;font-weight:600;margin:12px 0 6px}
+  .addbox label:first-child{margin-top:0}
+  .addbox input{width:100%;padding:10px 13px;border:1px solid var(--line);border-radius:10px;font-size:13.5px;font-family:inherit;background:#fff}
+  .addbox .btn{margin-top:14px;font-size:12.5px;font-weight:600;padding:8px 16px;border-radius:999px;background:var(--ink);color:#fff;border:none;cursor:pointer;font-family:inherit}
+  .addstatus{font-size:12px;margin-top:8px}
+  .addstatus.ok{color:var(--ok)}
+  .addstatus.err{color:var(--err)}
 </style>
 </head>
 <body>
@@ -99,11 +113,38 @@
     <div class="plist" id="plist"></div>
   </div>
 
+  <div class="card">
+    <h2>Add a product</h2>
+    <p>Creates a new, unpublished product with no photos or price yet — pick it from the list above afterward to finish setting it up.</p>
+    <div class="addbox">
+      <label for="addId">Product ID (code)</label>
+      <input type="text" id="addId" placeholder="e.g. TV010" />
+      <label for="addName">Name</label>
+      <input type="text" id="addName" placeholder="e.g. Smart TV 55&quot;" />
+      <label for="addCategory">Category</label>
+      <input type="text" id="addCategory" list="categoryOptions" placeholder="e.g. Television" />
+      <datalist id="categoryOptions"></datalist>
+      <label for="addBrand">Brand</label>
+      <input type="text" id="addBrand" placeholder="e.g. Hisense" />
+      <label for="addModel">Model (optional)</label>
+      <input type="text" id="addModel" placeholder="e.g. 55A6K" />
+      <button class="btn" id="addSaveBtn">Create product</button>
+      <div class="addstatus hidden" id="addStatus"></div>
+    </div>
+  </div>
+
   <div class="selected hidden" id="selectedPanel">
     <div class="sid" id="selId"></div>
     <div class="sname" id="selName"></div>
 
     <div class="thumbs" id="thumbs"></div>
+
+    <div class="namebox">
+      <label for="nameInput">Product name</label>
+      <input type="text" id="nameInput" placeholder="e.g. Smart TV 55&quot;" />
+      <button class="btn" id="nameSaveBtn">Save name</button>
+      <div class="namestatus hidden" id="nameStatus"></div>
+    </div>
 
     <div class="descbox">
       <label for="descInput">Short description (shows on the product page)</label>
@@ -163,7 +204,45 @@ async function loadProducts(){
   if(error){ document.getElementById("plist").innerHTML = `<div class="prow" style="color:var(--err)">Could not load products.</div>`; return; }
   PRODUCTS = data||[];
   renderList("");
+  renderCategoryOptions();
 }
+function renderCategoryOptions(){
+  const cats = Array.from(new Set(PRODUCTS.map(p=>p.category).filter(Boolean))).sort();
+  document.getElementById("categoryOptions").innerHTML = cats.map(c=>`<option value="${escapeHtml(c)}"></option>`).join("");
+}
+
+function setAddStatus(msg, kind){
+  const el = document.getElementById("addStatus");
+  el.textContent = msg;
+  el.className = "addstatus" + (kind?(" "+kind):"") + (msg?"":" hidden");
+  if(!msg) el.classList.add("hidden");
+}
+async function createProduct(){
+  const id = document.getElementById("addId").value.trim();
+  const name = document.getElementById("addName").value.trim();
+  const category = document.getElementById("addCategory").value.trim();
+  const brand = document.getElementById("addBrand").value.trim();
+  const model = document.getElementById("addModel").value.trim();
+  if(!id || !name){ setAddStatus("Product ID and name are required.", "err"); return; }
+  if(PRODUCTS.some(p=>p.id===id)){ setAddStatus(`"${id}" already exists — pick it from the list above instead.`, "err"); return; }
+  setAddStatus("Creating...", "");
+  const row = { id, name, category: category || "Other", brand, model };
+  const { data, error } = await client.from("products").insert(row).select("id,name,brand,category,published,selling_price,description");
+  if(error){ setAddStatus("Could not create: " + error.message, "err"); return; }
+  const created = data && data[0];
+  if(!created){ setAddStatus("Could not create: no row returned.", "err"); return; }
+  PRODUCTS.push(created);
+  renderCategoryOptions();
+  document.getElementById("addId").value = "";
+  document.getElementById("addName").value = "";
+  document.getElementById("addCategory").value = "";
+  document.getElementById("addBrand").value = "";
+  document.getElementById("addModel").value = "";
+  setAddStatus("Created — opening it below.", "ok");
+  renderList(document.getElementById("search").value);
+  await selectProduct(created.id);
+}
+document.getElementById("addSaveBtn").addEventListener("click", createProduct);
 function renderList(q){
   const query = q.trim().toLowerCase();
   const shown = PRODUCTS.filter(p=>!query || (p.id+" "+p.name+" "+p.brand).toLowerCase().includes(query));
@@ -181,10 +260,12 @@ async function selectProduct(id){
   document.getElementById("selectedPanel").classList.remove("hidden");
   document.getElementById("selId").innerHTML = `<code>${escapeHtml(id)}</code>`;
   document.getElementById("selName").textContent = p ? `${p.brand} ${p.name}` : id;
+  document.getElementById("nameInput").value = p ? (p.name||"") : "";
   document.getElementById("descInput").value = p ? (p.description||"") : "";
   document.getElementById("priceInput").value = p && p.selling_price ? p.selling_price : "";
   document.getElementById("publishedToggle").checked = !!(p && p.published);
   setPublishedLabel(!!(p && p.published));
+  setNameStatus("", "");
   setDescStatus("", "");
   setPriceStatus("", "");
   setStatus("", "");
@@ -246,6 +327,30 @@ async function togglePublished(){
   renderList(document.getElementById("search").value);
 }
 document.getElementById("publishedToggle").addEventListener("change", togglePublished);
+
+function setNameStatus(msg, kind){
+  const el = document.getElementById("nameStatus");
+  el.textContent = msg;
+  el.className = "namestatus" + (kind?(" "+kind):"") + (msg?"":" hidden");
+  if(!msg) el.classList.add("hidden");
+}
+async function saveName(){
+  if(!currentId || !PRODUCTS.some(p=>p.id===currentId)){
+    setNameStatus("Pick a product from the list above first.", "err");
+    return;
+  }
+  const value = document.getElementById("nameInput").value.trim();
+  if(!value){ setNameStatus("Name can't be empty.", "err"); return; }
+  const { data, error } = await client.from("products").update({ name: value }).eq("id", currentId).select("id");
+  if(error){ setNameStatus("Could not save: " + error.message, "err"); return; }
+  if(!data || !data.length){ setNameStatus(`No product with ID "${currentId}" exists.`, "err"); return; }
+  const p = PRODUCTS.find(x=>x.id===currentId);
+  if(p) p.name = value;
+  document.getElementById("selName").textContent = p ? `${p.brand} ${p.name}` : currentId;
+  renderList(document.getElementById("search").value);
+  setNameStatus("Saved.", "ok");
+}
+document.getElementById("nameSaveBtn").addEventListener("click", saveName);
 
 function setDescStatus(msg, kind){
   const el = document.getElementById("descStatus");
