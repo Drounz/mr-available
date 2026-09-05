@@ -77,9 +77,14 @@ Colors:
 
 Style rules:
 - Bold Poppins display headings with tight tracking. Headings end on an amber `.` accent (e.g. the homepage headline, the logo).
-- Soft rounded grey image tiles on product cards. Section headers have a title left and a link right.
+- Product card images are full-bleed: a bordered, rounded `.card` (16px) holding a `4:3` `.thumb` with `object-fit:cover` and no inner padding, so a photo fills the box edge to edge and crops sensibly. The category pill sits directly on the photo (top-left, `rgba(255,255,255,.85)` + `backdrop-filter:blur(4px)`) instead of below it. On hover the image scales to `1.06x` and the card lifts (`translateY(-3px)` + soft shadow). Section headers have a title left and a link right.
 - Prices in emerald. All order actions go to WhatsApp (green). Primary buttons are ink.
 - Currency is Naira: `"₦" + n.toLocaleString("en-NG")`.
+
+## Product card images and category-tinted fallbacks (`cardHtml()`)
+`cardHtml(p)` in `index.html` (and its duplicate in `api/render.js`, kept in sync — see SEO pre-rendering above) renders `.thumb`'s contents as three stacked absolutely-positioned layers, in this order: a category-tinted illustration (`.art`, always present), then the real `<img>` on top when `p.image` is set, then a bottom `.scrim` gradient for cat-tag legibility over bright photos. If the image is missing or its `onerror` fires (a 404, a bad URL), the `<img>` just sets `display:none` — the illustration underneath was there the whole time, so a product never shows a broken-image icon or bare grey box, intentionally or by failure.
+
+`categoryVisual(cat)` / `categoryArtHtml(cat)` map a product's free-text `category` string to one of 7 gradient tints (`amber`/`green`/`teal`/`navy`/`slate`/`clay`/`sky`) and one of a fixed set of line-art SVG icons (one per known appliance category — TV, AC, fridge, freezer, washer, generator, blender, fan, microwave, oven, cooker, kettle, iron, stabilizer, extension board, water dispenser, home theatre, air fryer), matched via keyword substring rules (`CAT_RULES`) so reasonable variants of a category name still resolve correctly. A category that matches nothing gets a generic box icon and a tint picked deterministically from a hash of the category string, so an unrecognized category (the owner can type anything, see Database above) still renders something intentional and stable rather than a crash or a random flicker between reloads. When adding a new real-world category, add a keyword rule and, ideally, a dedicated icon rather than letting it fall through to generic.
 
 ## Core behaviors to preserve
 - The homepage has no category tile grid — category filtering is the single row of pills (`#chips`, built by `renderChips()`) directly above the product grid, alongside search. Both filter the same grid.
