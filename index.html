@@ -16,7 +16,12 @@
     --wa:#25D366; --wa-dark:#1BAE56;
   }
   *,*::before,*::after{box-sizing:border-box}
-  html,body{margin:0;padding:0;max-width:100%;overflow-x:hidden}
+  /* overflow-x:hidden here would silently break position:sticky on the
+     header/shopbar below (a known Chromium quirk: any explicit overflow
+     value other than visible on html/body turns it into a scroll
+     container, which detaches sticky descendants from the viewport).
+     clip prevents the same horizontal scrollbar without that side effect. */
+  html,body{margin:0;padding:0;max-width:100%;overflow-x:clip}
   body{background:var(--paper);color:var(--ink);font-size:16px;
     font-family:"Poppins",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
     -webkit-font-smoothing:antialiased;line-height:1.5}
@@ -92,7 +97,7 @@
   .cat.on .cc{opacity:.7}
 
   /* shop controls */
-  .shopbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:18px}
+  .shopbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:18px;position:sticky;top:65px;z-index:30;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:12px 0;border-bottom:1px solid var(--line)}
   .search{flex:1;min-width:220px;display:flex;align-items:center;gap:8px;background:var(--soft);border:1px solid transparent;border-radius:999px;padding:11px 16px}
   .search:focus-within{background:#fff;border-color:var(--line)}
   .search input{border:none;outline:none;background:none;width:100%;font-size:14px;color:var(--ink);font-family:inherit}
